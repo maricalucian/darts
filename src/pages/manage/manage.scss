@@ -1,0 +1,10 @@
+.manage {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+
+  .tools {
+    display: flex;
+    justify-content: space-between;
+  }
+}

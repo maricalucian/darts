@@ -1,0 +1,20 @@
+.bracket-svg {
+  text {
+    dominant-baseline: middle;
+    text-anchor: middle;
+
+    &.info {
+      font-style: italic;
+      fill: #aaa;
+    }
+
+    &.winner {
+      font-weight: bold;
+    }
+
+    &.score {
+      fill: #fff;
+      font-weight: bold;
+    }
+  }
+}

@@ -1,0 +1,53 @@
+.matches {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+
+  .pending-matches {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    .match {
+      background-color: #e4d86b;
+      border-color: #a99f49;
+    }
+  }
+
+  .finished-matches {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .match {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
+
+    &.next {
+      cursor: pointer;
+    }
+
+    .p1,
+    .p2 {
+      flex: 1 1 0px;
+      padding: 8px;
+      font-weight: bold;
+    }
+
+    .divider {
+      padding: 8px;
+    }
+
+    .p1 {
+      text-align: right;
+    }
+  }
+}
