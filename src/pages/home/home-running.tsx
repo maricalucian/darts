@@ -6,6 +6,8 @@ import {
   Match,
   TRoundResults,
   TRoundResult,
+  TRoundPlayerList,
+  TRoundPlayer,
 } from "../../types";
 import {
   Box,
@@ -22,12 +24,11 @@ import { BLANK } from "../../core/constants";
 import "./home.scss";
 import { prizeSturcture } from "../../core/competition";
 
-type THomePageProps = {
+type THomeRunningProps = {
   competition: Competition;
   playersMap: TPlayersList;
   round: FirestoreRound;
-  roundPlayers: string[];
-  results: TRoundResults;
+  roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
 };
 
@@ -37,8 +38,7 @@ export const HomeRunning = ({
   playersMap,
   popupMatchInfo,
   roundPlayers,
-  results,
-}: THomePageProps): ReactElement => {
+}: THomeRunningProps): ReactElement => {
   const [progress, setProgress] = useState(0);
   const [hf, setHf] = useState(0);
   const [one80s, setOne80s] = useState(0);
@@ -66,10 +66,10 @@ export const HomeRunning = ({
   }, [competition]);
 
   useEffect(() => {
-    if (roundPlayers.length < 3) {
+    if (Object.keys(roundPlayers).length < 3) {
       return;
     }
-    const players = roundPlayers.length;
+    const players = Object.keys(roundPlayers).length;
     let prizesMap = {};
     Object.keys(prizeSturcture).forEach((k) => {
       if (parseInt(k) < players) {
@@ -94,47 +94,28 @@ export const HomeRunning = ({
 
   useEffect(() => {
     if (
-      Object.keys(results || []).length > 0 &&
+      Object.keys(roundPlayers || []).length > 0 &&
       Object.keys(playersMap || []).length > 0
     ) {
       let hf = 0;
       let one80s = 0;
       let total180 = 0;
-      let rankings: { rank: number; name: string }[] = [];
-      Object.keys(results).forEach((k) => {
-        if (results[k]?.hf > hf) {
-          hf = results[k].hf;
+      Object.values(roundPlayers).forEach((player) => {
+        if (player?.hf && player?.hf  > hf) {
+          hf = player.hf;
         }
-        if (results[k]?.one80s > one80s) {
-          one80s = results[k].one80s;
+        if (player?.one80s && player?.one80s > one80s) {
+          one80s = player.one80s;
         }
 
-        total180 += results[k].one80s || 0;
+        total180 += player.one80s || 0;
 
-        if (results[k]?.rank) {
-          rankings.push({
-            rank: results[k]?.rank,
-            name: playersMap[k]?.name,
-          });
-        }
       });
-
-      rankings.sort((a, b) => {
-        if (a.rank < b.rank) {
-          return -1;
-        } else if (a.rank > b.rank) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-
       setHf(hf);
       setOne80s(one80s);
-      setRankings(rankings);
       setTotalOne80s(total180);
     }
-  }, [results, playersMap]);
+  }, [roundPlayers, playersMap]);
 
   return (
     <>
@@ -185,7 +166,7 @@ export const HomeRunning = ({
         <div className="stats">
           <div className="stat">
             <div className="stat-name">Total players</div>
-            <div className="stat-value">{roundPlayers.length}</div>
+            <div className="stat-value">{Object.keys(roundPlayers).length}</div>
           </div>
           <div className="stat">
             <div className="stat-name">Most 180s</div>
@@ -218,18 +199,6 @@ export const HomeRunning = ({
             </CardContent>
           </Card>
         </div>
-      </div>
-      <h3>Results</h3>
-      <div className="rankings">
-        <List>
-          {rankings.map((ranking, i) => {
-            return (
-              <ListItem key={i} disablePadding>
-                <ListItemText primary={`${ranking.rank}. ${ranking.name}`} />
-              </ListItem>
-            );
-          })}
-        </List>
       </div>
     </>
   );

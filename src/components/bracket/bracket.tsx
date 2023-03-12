@@ -334,7 +334,19 @@ export const Bracket = ({
   const rounds = Math.floor(Math.log2(Object.keys(competition).length));
   const horizontalSpace = getHorizontalSpace(rounds);
   const width = horizontalSpace;
-  const height = 1400;
+  const seedMatches = Math.pow(2, rounds - 1);
+  const bracketHeight =
+    margin +
+    seedMatches * (matchHeight + matchVerticalSpacing) -
+    matchVerticalSpacing +
+    margin;
+  const leftBracketHeight =
+    margin +
+    (seedMatches / 2) * (matchHeight + matchVerticalSpacing) -
+    matchVerticalSpacing +
+    margin;
+
+  const height = bracketHeight + leftBracketHeight;
 
   return (
     <>

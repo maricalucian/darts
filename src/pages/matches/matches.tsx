@@ -75,7 +75,7 @@ export const MatchesPage = ({
           })
           .map((match) => (
             <div
-              className="match next"
+              className="match finished"
               onClick={() => {
                 popupMatchInfo(round.round, match);
               }}

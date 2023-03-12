@@ -70,8 +70,8 @@ const getBlanksPositions = (
 
 export const startRound = async (round: FirestoreRound) => {
   if (round.status !== "registering") {
-    // alert("Round cannot start at this time!");
-    // return;
+    alert("Round cannot start at this time!");
+    return;
   }
 
   const roundPlayers = await getRoundPlayers(round.round);
@@ -79,7 +79,7 @@ export const startRound = async (round: FirestoreRound) => {
   const size = nextPowerOfTwo(playersList.length);
   const blanks = getBlanksPositions(size - playersList.length, 0, size - 1);
 
-  const competition = getCompetitionMatches(playersList.length);
+  let competition = getCompetitionMatches(playersList.length);
 
   for (let i = 0; i < size / 2; i++) {
     if (blanks.includes(i * 2)) {
@@ -95,7 +95,8 @@ export const startRound = async (round: FirestoreRound) => {
       playersList.shift();
     }
   }
-  // console.log(competition);
+  // process byes
+  competition = getProcessedCompetition(competition);
 
   startCompetition(round.round, competition);
 };

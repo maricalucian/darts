@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { FirestoreRound, TPlayersList } from "../../types";
+import { FirestoreRound, TPlayersList, TRoundPlayerList } from "../../types";
 import { Box } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -20,17 +20,17 @@ import {
 type TCompetitionPlayersProps = {
   round: FirestoreRound;
   playersMap: TPlayersList;
-  roundPlayers: string[];
+  roundPlayers: TRoundPlayerList;
 };
 
 
 const getAvailablePlayersArray = (
   allPlayers: TPlayersList,
-  selectedPlayers: string[]
+  selectedPlayers: TRoundPlayerList
 ): string[] => {
   const availablePlayers: string[] = [];
-  Object.keys(allPlayers).forEach((id) => {
-    if (!selectedPlayers.includes(id)) {
+  Object.keys(allPlayers || []).forEach((id) => {
+    if (!Object.keys(selectedPlayers || []).includes(id)) {
       availablePlayers.push(id);
     }
   });
@@ -75,7 +75,7 @@ export const CompetitionPlayers = ({
                       disablePadding
                     >
                       <ListItemButton>
-                        <ListItemText primary={playersMap[playerId].name} />
+                        <ListItemText primary={playersMap[playerId]?.name} />
                       </ListItemButton>
                     </ListItem>
                   );
@@ -99,7 +99,7 @@ export const CompetitionPlayers = ({
             <h3 style={{ textAlign: "center" }}>Selected players</h3>
             <div className="list-container">
               <List>
-                {roundPlayers.map((playerId) => {
+                {Object.keys(roundPlayers).map((playerId) => {
                   return (
                     <ListItem
                       key={playerId}
@@ -116,7 +116,7 @@ export const CompetitionPlayers = ({
                       disablePadding
                     >
                       <ListItemButton>
-                        <ListItemText primary={playersMap[playerId].name} />
+                        <ListItemText primary={playersMap[playerId]?.name} />
                       </ListItemButton>
                     </ListItem>
                   );

@@ -9,7 +9,7 @@ import {
 } from "../../firestore/competition";
 
 import { CompetitionPlayers } from "../../components/competition-players/competition-players";
-import { FirestoreRound, TPlayersList } from "../../types";
+import { FirestoreRound, TPlayersList, TRoundPlayerList } from "../../types";
 import {
   Button,
   Dialog,
@@ -26,7 +26,7 @@ import { startRound } from "../../core/competition";
 type TManagePage = {
   round: FirestoreRound;
   playersMap: TPlayersList;
-  roundPlayers: string[];
+  roundPlayers: TRoundPlayerList;
   showLoader: (visible: boolean) => void;
 };
 
@@ -51,7 +51,7 @@ export const ManagePage = ({
       <div className="tools">
         <div className="stats">
           Total players: {Object.keys(playersMap).length} <br />
-          Competition players: {roundPlayers.length}
+          Competition players: {Object.keys(roundPlayers).length}
           <br />
           Competition status: {round.status}
         </div>

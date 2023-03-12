@@ -52,6 +52,10 @@ export type TPlayersList = {
 
 export type TRoundPlayer = {
   uid: string;
+  paid?: boolean;
+  rank?: number;
+  hf?: number;
+  one80s?: number;
 }
 
 export type TRoundPlayerList = {

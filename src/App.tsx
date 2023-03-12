@@ -8,7 +8,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import {
   getCurrentRoundIndex,
   subscribeToAllPlayers,
-  subscribeToResults,
   subscribeToRound,
   subscribeToRoundMatches,
   subscribeToRoundPlayers,
@@ -20,6 +19,7 @@ import {
   FirestoreRound,
   Match,
   TPlayersList,
+  TRoundPlayerList,
   TRoundResults,
 } from "./types";
 import { ManagePage } from "./pages/manage/manage";
@@ -41,14 +41,13 @@ function App() {
   const [round, setRound] = useState({} as FirestoreRound);
   const [currendRoundIndex, setCurrentRoundIndex] = useState(0);
   const [playersMap, setPlayersMap] = useState({} as TPlayersList);
-  const [roundPlayers, setRoundPlayers] = useState([] as string[]);
+  const [roundPlayers, setRoundPlayers] = useState({} as TRoundPlayerList);
   const [competition, setCompetition] = useState({} as Competition);
   const [loaderIsOpen, setLoaderOpen] = useState(false);
   const [matchDialogIsOpen, setMatchDialogOpen] = useState(false);
   const [dialogMatch, setDialogMatch] = useState({} as Match);
   const [usersMap, setUsersMap] = useState({} as { [key: string]: string });
   const [user, setUser] = useState({} as AppUser);
-  const [results, setResults] = useState({} as TRoundResults);
 
   useEffect(() => {
     const auth = getAuth();
@@ -76,15 +75,6 @@ function App() {
     if (!round.round) {
       return;
     }
-    return subscribeToResults(round.round, (data: TRoundResults) => {
-      setResults(data);
-    });
-  }, [round.round]);
-
-  useEffect(() => {
-    if (!round.round) {
-      return;
-    }
     return subscribeToUsersMap((data: { [key: string]: string }) => {
       setUsersMap(data);
     });
@@ -94,7 +84,7 @@ function App() {
     if (!round.round) {
       return;
     }
-    return subscribeToRoundPlayers(round.round, (data: string[]) => {
+    return subscribeToRoundPlayers(round.round, (data: TRoundPlayerList) => {
       setRoundPlayers(data);
     });
   }, [round.round]);
@@ -137,7 +127,6 @@ function App() {
           path="/"
           element={
             <HomePage
-              results={results}
               roundPlayers={roundPlayers}
               competition={competition}
               playersMap={playersMap}
@@ -149,7 +138,7 @@ function App() {
         <Route
           path="/bracket"
           element={
-            <BracketPage competition={competition} playersMap={playersMap} />
+            <BracketPage round={round} competition={competition} playersMap={playersMap} />
           }
         />
         <Route

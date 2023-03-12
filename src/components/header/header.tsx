@@ -6,7 +6,6 @@ import { AppUser, FirestoreRound } from "../../types";
 import { getAuth } from "firebase/auth";
 import { Box, AppBar, Toolbar, Button } from "@mui/material";
 
-import MenuIcon from "@mui/icons-material/Menu";
 import "./header.scss";
 import { ADM } from "../../core/constants";
 
@@ -63,6 +62,7 @@ export const Header = ({ round, user }: HeaderProps): ReactElement => {
                 }}
               >
                 Logout
+                <span style={{ fontSize: "10px", position: 'absolute', marginTop: '28px', right: '4px' }}>{user.user?.email}</span>
               </Button>
             )}
             {!user.loggedIn && (

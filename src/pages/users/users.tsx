@@ -125,6 +125,21 @@ export const UsersPage = ({
         <DialogContent>
           <div className="list-container">
             <List>
+              <ListItem
+                key={999}
+                disablePadding
+                className={`${
+                  selectedPlayer === 'XXNONE' && "selected-list-item"
+                }`}
+              >
+                <ListItemButton
+                  onClick={() => {
+                    setSelectedPlayer('XXNONE');
+                  }}
+                >
+                  <ListItemText primary={'Not Specified'} />
+                </ListItemButton>
+              </ListItem>
               {unusedPlayer.map((playerId) => {
                 return (
                   <ListItem
@@ -137,7 +152,6 @@ export const UsersPage = ({
                     <ListItemButton
                       onClick={() => {
                         setSelectedPlayer(playerId);
-                        closeModal();
                       }}
                     >
                       <ListItemText primary={playersMap[playerId].name} />
@@ -156,6 +170,7 @@ export const UsersPage = ({
             variant="contained"
             onClick={() => {
               updateUsersPlayer(selectedUserUid, selectedPlayer);
+              closeModal();
             }}
           >
             Set Player

@@ -6,6 +6,35 @@
   align-items: center;
   padding: 0 16px;
 
+  .top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .status {
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: #fff;
+      background-color: #999;
+
+      &.registering {
+        background-color: #e5aa29;
+      }
+      &.running {
+        background-color: #40a330;
+      }
+      &.finished {
+        background-color: #3095a3;
+      }
+    }
+
+    .total-players {
+      font-weight: bold;
+    }
+  }
+
   .matches {
     margin-left: auto;
     margin-right: auto;
