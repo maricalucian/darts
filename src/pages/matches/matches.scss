@@ -12,6 +12,11 @@
     .match {
       background-color: #e4d86b;
       border-color: #a99f49;
+
+      .p1,
+      .p2 {
+        font-weight: bold;
+      }
     }
   }
 
@@ -39,15 +44,23 @@
     .p2 {
       flex: 1 1 0px;
       padding: 8px;
-      font-weight: bold;
+      // font-weight: bold;
     }
 
     .divider {
-      padding: 8px;
+      padding: 8px 4px;
     }
 
     .p1 {
       text-align: right;
+    }
+
+    .match-no {
+      position: absolute;
+      color: #999;
+      font-size: 18px;
+      font-style: italic;
+      line-height: 32px;
     }
   }
 }

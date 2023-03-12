@@ -11,12 +11,15 @@ import {
 import "./match-info-dialog.scss";
 import { FirestoreRound, Match, TPlayersList } from "../../types";
 import { updateMatchResult } from "../../firestore/competition";
+import { ADM } from "../../core/constants";
 
 type TMatchInfoProps = {
   round: FirestoreRound;
   playersMap: TPlayersList;
   dialogIsOpen: boolean;
+  usersMap: { [key: string]: string };
   match: Match;
+  uid: string;
   closeDialog: () => void;
 };
 
@@ -35,6 +38,8 @@ export const MatchInfoDialog = ({
   match,
   closeDialog,
   playersMap,
+  usersMap,
+  uid,
 }: TMatchInfoProps): ReactElement => {
   const [dialogEditMode, setDialogEditMode] = useState(false);
   const [results, setResults] = useState({
@@ -48,7 +53,7 @@ export const MatchInfoDialog = ({
 
   useEffect(() => {
     results.score1 = match.score1?.toString() || "";
-    results.score2 = match.score1?.toString() || "";
+    results.score2 = match.score2?.toString() || "";
     results.player1180s = match.player1180s?.toString() || "";
     results.player2180s = match.player2180s?.toString() || "";
     results.player1HF = match.player1HF?.toString() || "";
@@ -58,6 +63,14 @@ export const MatchInfoDialog = ({
   const closeMatchDialog = () => {
     setDialogEditMode(false);
     closeDialog();
+    setResults({
+      score1: "",
+      score2: "",
+      player1180s: "",
+      player2180s: "",
+      player1HF: "",
+      player2HF: "",
+    });
   };
 
   const updateResult = (res: string, inputVal: string) => {
@@ -217,17 +230,20 @@ export const MatchInfoDialog = ({
             >
               Close
             </Button>
-            {!dialogEditMode && (
-              <Button
-                variant="contained"
-                color="info"
-                onClick={() => {
-                  setDialogEditMode(true);
-                }}
-              >
-                Update Score
-              </Button>
-            )}
+            {!dialogEditMode &&
+              (usersMap[uid] === match.player1 ||
+                usersMap[uid] === match.player2 ||
+                uid === ADM) && (
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={() => {
+                    setDialogEditMode(true);
+                  }}
+                >
+                  Update Score
+                </Button>
+              )}
             {dialogEditMode && (
               <Button
                 variant="contained"

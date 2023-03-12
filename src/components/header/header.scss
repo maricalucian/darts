@@ -1,3 +1,13 @@
 .header {
   height: 100px;
+
+  .menu-item {
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+    &:hover {
+      color: yellow;
+      border-bottom: 1px solid white;
+    }
+  }
 }

@@ -1,6 +1,12 @@
 import React, { ReactElement, useState } from "react";
 
-import { addPlayer, startNewRound } from "../../firestore/competition";
+import {
+  addPlayer,
+  deleteAllMatches,
+  deleteAllRoundResults,
+  setRoundStatus,
+  startNewRound,
+} from "../../firestore/competition";
 
 import { CompetitionPlayers } from "../../components/competition-players/competition-players";
 import { FirestoreRound, TPlayersList } from "../../types";
@@ -39,17 +45,9 @@ export const ManagePage = ({
   const handlePlayerNameChange = (event: any) => {
     setNewPlayerName(event.target.value);
   };
+
   return (
     <div className="manage">
-      <button
-        onClick={() => {
-          startNewRound();
-        }}
-      >
-        Start New Round
-      </button>
-      <br />
-      <br />
       <div className="tools">
         <div className="stats">
           Total players: {Object.keys(playersMap).length} <br />
@@ -69,27 +67,89 @@ export const ManagePage = ({
           >
             Add player
           </Button>
-          <Button
-            variant="contained"
-            color="success"
-            sx={{
-              marginLeft: 1,
-              marginBottom: 1,
-            }}
-            onClick={() => {
-              startRound(round);
-            }}
-          >
-            Start competition
-          </Button>
+          {round.status === "registering" && (
+            <Button
+              variant="contained"
+              color="success"
+              sx={{
+                marginLeft: 1,
+                marginBottom: 1,
+              }}
+              onClick={() => {
+                startRound(round);
+              }}
+            >
+              Start competition
+            </Button>
+          )}
+          {round.status === "running" && (
+            <Button
+              variant="contained"
+              color="error"
+              sx={{
+                marginLeft: 1,
+                marginBottom: 1,
+              }}
+              onClick={() => {
+                if (
+                  // eslint-disable-next-line no-restricted-globals
+                  confirm(
+                    "Are you sure you want to delete all matches and restart round?"
+                  )
+                ) {
+                  if (
+                    // eslint-disable-next-line no-restricted-globals
+                    confirm("All progress will be lost!")
+                  ) {
+                    startRound(round).then(() => {
+                      deleteAllRoundResults(round.round);
+                    });
+                  }
+                }
+              }}
+            >
+              Restart competition
+            </Button>
+          )}
+          {round.status === "running" && (
+            <Button
+              variant="contained"
+              color="error"
+              sx={{
+                marginLeft: 1,
+                marginBottom: 1,
+              }}
+              onClick={() => {
+                if (
+                  // eslint-disable-next-line no-restricted-globals
+                  confirm(
+                    "Are you sure you want to delete all matches and go in registering mode?"
+                  )
+                ) {
+                  if (
+                    // eslint-disable-next-line no-restricted-globals
+                    confirm("All progress will be lost!")
+                  ) {
+                    deleteAllMatches(round.round);
+                    deleteAllRoundResults(round.round);
+                    setRoundStatus(round.round, "registering");
+                  }
+                }
+              }}
+            >
+              Reset competition
+            </Button>
+          )}
         </div>
       </div>
 
-      <CompetitionPlayers
-        round={round}
-        playersMap={playersMap}
-        roundPlayers={roundPlayers}
-      />
+      {round.status === "registering" && (
+        <CompetitionPlayers
+          round={round}
+          playersMap={playersMap}
+          roundPlayers={roundPlayers}
+        />
+      )}
 
       <Dialog open={modalIsOpen} onClose={closeModal} fullWidth={true}>
         <DialogTitle>Add player</DialogTitle>

@@ -1,3 +1,38 @@
 .home {
-  
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+
+  .matches {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 32px;
+    .match {
+      background-color: #e4d86b;
+      border-color: #a99f49;
+    }
+  }
+  .competition-info {
+    margin-top: 24px;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: row;
+    .stats {
+      flex: 1 1 0px;
+      .stat {
+      }
+      .stat-name {
+      }
+      .stat-value {
+        font-size: 29px;
+        font-weight: bold;
+      }
+    }
+    .prizes {
+      flex: 1 1 0px;
+    }
+  }
 }

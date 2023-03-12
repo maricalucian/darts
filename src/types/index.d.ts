@@ -1,3 +1,5 @@
+import { User } from "firebase/auth";
+
 export type MatchLocation = "seed" | "right" | "left" | "newcomers" | "final";
 
 // export type Matches = { [key: string]: Match };
@@ -63,4 +65,19 @@ export type TResults = {
   player2180s: number;
   player1HF: number;
   player2HF: number;
+};
+
+export type AppUser = {
+  loggedIn: boolean;
+  user?: User;
+}
+
+export type TRoundResult = {
+  hf: number;
+  one80s: number;
+  rank: number
+}
+
+export type TRoundResults = {
+  [key: string]: TRoundResult;
 };

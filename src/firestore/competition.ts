@@ -20,6 +20,8 @@ import {
   TPlayersList,
   TResults,
   TRoundPlayerList,
+  TRoundResult,
+  TRoundResults,
 } from "../types";
 import { BLANK } from "../core/constants";
 import {
@@ -160,6 +162,30 @@ export const removeRoundPlayer = (roundIndex: number, playerId: string) => {
   );
 };
 
+export const deleteAllRoundResults = async (roundIndex: number) => {
+  const querySnapshot = await getDocs(
+    collection(db, `/competitions/duminica23/rounds/${roundIndex}/results`)
+  );
+  querySnapshot.forEach((d) => {
+    // doc.data() is never undefined for query doc snapshots
+    deleteDoc(
+      doc(db, `/competitions/duminica23/rounds/${roundIndex}/results/${d.id}`)
+    );
+  });
+};
+
+export const deleteAllMatches = async (roundIndex: number) => {
+  const querySnapshot = await getDocs(
+    collection(db, `/competitions/duminica23/rounds/${roundIndex}/matches`)
+  );
+  querySnapshot.forEach((d) => {
+    // doc.data() is never undefined for query doc snapshots
+    deleteDoc(
+      doc(db, `/competitions/duminica23/rounds/${roundIndex}/matches/${d.id}`)
+    );
+  });
+};
+
 export const startCompetition = async (
   roundIndex: number,
   competition: Competition
@@ -195,7 +221,19 @@ export const startCompetition = async (
   );
 };
 
+export const setRoundStatus = async (roundIndex: number, status: string) => {
+  return await setDoc(
+    doc(db, `competitions/duminica23/rounds/${roundIndex}`),
+    {
+      status: status,
+    },
+    { merge: true }
+  );
+}
+
 export const processCompetition = async (roundIndex: number) => {
+  return;
+
   const competition: Competition = {};
   const querySnapshot = await getDocs(
     collection(db, `competitions/duminica23/rounds/${roundIndex}/matches`)
@@ -250,5 +288,41 @@ export const updateMatchResult = async (
     { merge: true }
   );
   // todo remove this
-  processCompetition(roundIndex);
+  // processCompetition(roundIndex);
+};
+
+export const updateUsersPlayer = async (userId: string, playerId: string) => {
+  await setDoc(doc(db, `users/${userId}`), {
+    playerId: playerId,
+  });
+
+  await setDoc(
+    doc(db, `players/${playerId}`),
+    {
+      userId: userId,
+    },
+    { merge: true }
+  );
+};
+
+export const subscribeToUsersMap = (callback: any) => {
+  return onSnapshot(collection(db, `users`), (snapshot) => {
+    const usersMap: { [key: string]: string } = {};
+    snapshot.forEach((d) => {
+      usersMap[d.id] = d.data().playerId;
+    });
+    callback(usersMap);
+  });
+};
+export const subscribeToResults = (roundIndex: number, callback: any) => {
+  return onSnapshot(
+    collection(db, `competitions/duminica23/rounds/${roundIndex}/results`),
+    (snapshot) => {
+      const roundResults: TRoundResults = {};
+      snapshot.forEach((d) => {
+        roundResults[d.id] = d.data() as TRoundResult;
+      });
+      callback(roundResults);
+    }
+  );
 };

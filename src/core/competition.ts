@@ -2,6 +2,38 @@ import { getRoundPlayers, startCompetition } from "../firestore/competition";
 import { Competition, FirestoreRound, Match } from "../types";
 import { BLANK } from "./constants";
 
+export const prizeSturcture = {
+  0: {
+    1: 50,
+    2: 30,
+    3: 20,
+  },
+  8: {
+    1: 40,
+    2: 30,
+    3: 20,
+    4: 10,
+  },
+  13: {
+    1: 35,
+    2: 25,
+    3: 15,
+    4: 10,
+    5: 7.5,
+    6: 7.5,
+  },
+  17: {
+    1: 28,
+    2: 20,
+    3: 14,
+    4: 10,
+    5: 8,
+    6: 8,
+    7: 6,
+    8: 6,
+  }
+}
+
 const nextPowerOfTwo = (num: number): number => {
   let result = 1;
   while (result < num) {
@@ -15,7 +47,6 @@ const getBlanksPositions = (
   min: number,
   max: number
 ): number[] => {
-  console.log(`gettin ${requiredBlanks} blanks between ${min} and ${max}`);
 
   if (requiredBlanks > 1) {
     let b1 = Math.floor(requiredBlanks / 2);
@@ -64,7 +95,7 @@ export const startRound = async (round: FirestoreRound) => {
       playersList.shift();
     }
   }
-  console.log(competition);
+  // console.log(competition);
 
   startCompetition(round.round, competition);
 };
@@ -139,7 +170,7 @@ export const getRoundsMatches = (
       winnerMatch: nextMatch + roundMatches * 2 + i,
       looserMatch: 0,
       winnerPosition: 0,
-      looserPosition: roundMatches * 4 - i,
+      looserPosition: roundMatches * 3 + 1,
       round: round,
       location: "left",
       indexInColumn: i,
@@ -158,7 +189,7 @@ export const getRoundsMatches = (
         Math.floor(i / 2),
       looserMatch: 0,
       winnerPosition: 0,
-      looserPosition: roundMatches * 3 - i,
+      looserPosition: roundMatches * 2 + 1,
       round: round,
       location: "newcomers",
       indexInColumn: i,

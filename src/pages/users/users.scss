@@ -1,0 +1,51 @@
+.users {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 8px;
+
+  .users-list {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .user-item {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
+    cursor: pointer;
+
+    .left {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 40px;
+      justify-content: center;
+
+      .user-name {
+        font-weight: bold;
+      }
+    }
+    .right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}
+
+.MuiDialog-container {
+  li.selected-list-item {
+    background-color: #adcfe3;
+  }
+
+  .list-container {
+    max-height: 400px;
+  }
+}

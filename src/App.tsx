@@ -8,16 +8,28 @@ import CircularProgress from "@mui/material/CircularProgress";
 import {
   getCurrentRoundIndex,
   subscribeToAllPlayers,
+  subscribeToResults,
   subscribeToRound,
   subscribeToRoundMatches,
   subscribeToRoundPlayers,
+  subscribeToUsersMap,
 } from "./firestore/competition";
-import { Competition, FirestoreRound, Match, TPlayersList } from "./types";
+import {
+  AppUser,
+  Competition,
+  FirestoreRound,
+  Match,
+  TPlayersList,
+  TRoundResults,
+} from "./types";
 import { ManagePage } from "./pages/manage/manage";
 import { MatchesPage } from "./pages/matches/matches";
+import {  getAuth, onAuthStateChanged } from "firebase/auth";
 
 import "./App.scss";
 import { MatchInfoDialog } from "./components/match-info-dialog/match-info-dialog";
+import { LoginPage } from "./pages/login/login";
+import { UsersPage } from "./pages/users/users";
 
 const emptyRound: FirestoreRound = {
   players: [],
@@ -26,7 +38,7 @@ const emptyRound: FirestoreRound = {
 };
 
 function App() {
-  const [round, setRound] = useState(emptyRound);
+  const [round, setRound] = useState({} as FirestoreRound);
   const [currendRoundIndex, setCurrentRoundIndex] = useState(0);
   const [playersMap, setPlayersMap] = useState({} as TPlayersList);
   const [roundPlayers, setRoundPlayers] = useState([] as string[]);
@@ -34,6 +46,25 @@ function App() {
   const [loaderIsOpen, setLoaderOpen] = useState(false);
   const [matchDialogIsOpen, setMatchDialogOpen] = useState(false);
   const [dialogMatch, setDialogMatch] = useState({} as Match);
+  const [usersMap, setUsersMap] = useState({} as { [key: string]: string });
+  const [user, setUser] = useState({} as AppUser);
+  const [results, setResults] = useState({} as TRoundResults);
+
+  useEffect(() => {
+    const auth = getAuth();
+    return onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        setUser({
+          loggedIn: true,
+          user: authUser,
+        });
+      } else {
+        setUser({
+          loggedIn: false,
+        });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     return subscribeToAllPlayers((data: TPlayersList) => {
@@ -42,12 +73,36 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!round.round) {
+      return;
+    }
+    return subscribeToResults(round.round, (data: TRoundResults) => {
+      setResults(data);
+    });
+  }, [round.round]);
+
+  useEffect(() => {
+    if (!round.round) {
+      return;
+    }
+    return subscribeToUsersMap((data: { [key: string]: string }) => {
+      setUsersMap(data);
+    });
+  }, [round.round]);
+
+  useEffect(() => {
+    if (!round.round) {
+      return;
+    }
     return subscribeToRoundPlayers(round.round, (data: string[]) => {
       setRoundPlayers(data);
     });
   }, [round.round]);
 
   useEffect(() => {
+    if (!round.round) {
+      return;
+    }
     return subscribeToRoundMatches(round.round, (data: Competition) => {
       setCompetition(data);
     });
@@ -76,9 +131,21 @@ function App() {
 
   return (
     <div className="app">
-      <Header round={round} />
+      <Header round={round} user={user} />
       <Routes>
-        <Route path="/" element={<HomePage round={round} />} />
+        <Route
+          path="/"
+          element={
+            <HomePage
+              results={results}
+              roundPlayers={roundPlayers}
+              competition={competition}
+              playersMap={playersMap}
+              popupMatchInfo={showMatchInfo}
+              round={round}
+            />
+          }
+        />
         <Route
           path="/bracket"
           element={
@@ -107,6 +174,18 @@ function App() {
             />
           }
         />
+        <Route path="/login" element={<LoginPage user={user} />} />
+        <Route
+          path="/users"
+          element={
+            <UsersPage
+              user={user}
+              playersMap={playersMap}
+              usersMap={usersMap}
+              showLoader={setLoaderOpen}
+            />
+          }
+        />
       </Routes>
 
       <MatchInfoDialog
@@ -114,7 +193,9 @@ function App() {
         playersMap={playersMap}
         dialogIsOpen={matchDialogIsOpen}
         match={dialogMatch}
+        usersMap={usersMap}
         closeDialog={closeMatchDialog}
+        uid={user.user?.uid || ""}
       />
 
       <Backdrop
