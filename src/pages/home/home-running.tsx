@@ -78,6 +78,7 @@ export const HomeRunning = ({
       }
     });
 
+
     const total = players * 10;
 
     let prize: any = [];
@@ -85,7 +86,7 @@ export const HomeRunning = ({
       prize.push({
         rank: k,
         // @ts-ignore
-        prize: Math.round((prizesMap[k] * 100) / total),
+        prize: Math.round(total * (prizesMap[k] / 100)),
       });
     });
 
