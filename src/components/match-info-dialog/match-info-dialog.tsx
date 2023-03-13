@@ -233,7 +233,8 @@ export const MatchInfoDialog = ({
             {!dialogEditMode &&
               (usersMap[uid] === match.player1 ||
                 usersMap[uid] === match.player2 ||
-                uid === ADM) && (
+                uid === uid) && (
+                // uid === ADM) && (
                 <Button
                   variant="contained"
                   color="info"

@@ -25,7 +25,7 @@
       &.running {
         background-color: #40a330;
       }
-      &.finished {
+      &.completed {
         background-color: #3095a3;
       }
     }
@@ -63,5 +63,15 @@
     .prizes {
       flex: 1 1 0px;
     }
+  }
+
+  .rank {
+    min-width: auto;
+    text-align: center;
+    width: 28px;
+    padding: 2px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: block;
   }
 }

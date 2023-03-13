@@ -7,9 +7,10 @@ import {
   TRoundResults,
   TRoundResult,
   TRoundPlayerList,
+  TRoundPlayer,
 } from "../../types";
 
-import { ListItemText, List, ListItem } from "@mui/material";
+import { ListItemText, List, ListItem, ListItemIcon } from "@mui/material";
 
 import ListItemButton from "@mui/material/ListItemButton";
 import IconButton from "@mui/material/IconButton";
@@ -44,7 +45,7 @@ export const HomePage = ({
           {Object.keys(roundPlayers).length} players
         </div>
       </div>
-      {round.status === "running" && (
+      {round.status === "running" || round.status === "completed" && (
         <HomeRunning
           roundPlayers={roundPlayers}
           competition={competition}
@@ -65,53 +66,62 @@ export const HomePage = ({
       <h3>Players</h3>
       <div className="players">
         <List>
-          {Object.keys(roundPlayers).map((playerId) => {
-            return (
-              <ListItem
-                key={playerId}
-                secondaryAction={
-                  <IconButton
-                    edge="end"
-                    onClick={() => {
-                      if (
-                        // eslint-disable-next-line no-restricted-globals
-                        confirm(
-                          `Set ${playersMap[playerId].name} to ${
-                            roundPlayers[playerId].paid ? "NOT" : ""
-                          } PAID?`
-                        )
-                      ) {
-                        setPlayerPaid(
-                          round.round,
-                          playerId,
-                          !roundPlayers[playerId].paid
-                        );
-                      }
-                    }}
-                  >
-                    <PaidIcon
-                      style={{
-                        fill: roundPlayers[playerId].paid
-                          ? "#48b35c"
-                          : "#d0d0d0",
+          {Object.keys(roundPlayers)
+            .sort((a, b) => {
+              if ((roundPlayers[a]?.rank || 0) > (roundPlayers[b]?.rank || 0)) {
+                return 1;
+              } else if (
+                (roundPlayers[a]?.rank || 0) < (roundPlayers[b]?.rank || 0)
+              ) {
+                return -1;
+              } else {
+                return 0;
+              }
+            })
+            .map((playerId) => {
+              return (
+                <ListItem
+                  key={playerId}
+                  secondaryAction={
+                    <IconButton
+                      edge="end"
+                      onClick={() => {
+                        if (
+                          // eslint-disable-next-line no-restricted-globals
+                          confirm(
+                            `Set ${playersMap[playerId].name} to ${
+                              roundPlayers[playerId].paid ? "NOT" : ""
+                            } PAID?`
+                          )
+                        ) {
+                          setPlayerPaid(
+                            round.round,
+                            playerId,
+                            !roundPlayers[playerId].paid
+                          );
+                        }
                       }}
-                    />
-                  </IconButton>
-                }
-                disablePadding
-              >
-                <ListItemButton>
-                  <ListItemText
-                    primary={`${
-                      roundPlayers[playerId]?.rank
-                        ? roundPlayers[playerId]?.rank + ". "
-                        : ""
-                    } ${playersMap[playerId].name}`}
-                  />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
+                    >
+                      <PaidIcon
+                        style={{
+                          fill: roundPlayers[playerId].paid
+                            ? "#48b35c"
+                            : "#d0d0d0",
+                        }}
+                      />
+                    </IconButton>
+                  }
+                  disablePadding
+                >
+                  <ListItemIcon className="rank">
+                    {roundPlayers[playerId]?.rank || "-"}
+                  </ListItemIcon>
+                  <ListItemButton>
+                    <ListItemText primary={playersMap[playerId].name} />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
         </List>
       </div>
     </div>

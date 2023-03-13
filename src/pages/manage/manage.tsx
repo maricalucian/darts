@@ -140,6 +140,46 @@ export const ManagePage = ({
               Reset competition
             </Button>
           )}
+          {round.status === "running" && (
+            <Button
+              variant="contained"
+              color="success"
+              sx={{
+                marginLeft: 1,
+                marginBottom: 1,
+              }}
+              onClick={() => {
+                if (
+                  // eslint-disable-next-line no-restricted-globals
+                  confirm("Are you sure you want to finish the competition?")
+                ) {
+                  setRoundStatus(round.round, "completed");
+                }
+              }}
+            >
+              Finish competition
+            </Button>
+          )}
+          {round.status === "completed" && (
+            <Button
+              variant="contained"
+              color="error"
+              sx={{
+                marginLeft: 1,
+                marginBottom: 1,
+              }}
+              onClick={() => {
+                if (
+                  // eslint-disable-next-line no-restricted-globals
+                  confirm("Are you sure you want set competition to running?")
+                ) {
+                  setRoundStatus(round.round, "running");
+                }
+              }}
+            >
+              Set to running
+            </Button>
+          )}
         </div>
       </div>
 

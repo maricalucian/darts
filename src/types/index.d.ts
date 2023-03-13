@@ -39,7 +39,7 @@ export type Competition = { [key: number]: Match };
 export type FirestoreRound = {
   players: string[];
   round: number;
-  status: "registering" | "running" | "finished";
+  status: "registering" | "running" | "completed";
 };
 
 export type TPlayer = {

@@ -12,7 +12,6 @@ import Grid from "@mui/material/Unstable_Grid2";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import "./competition-players.scss";
 import {
-  addPlayer,
   addPlayerToRound,
   removeRoundPlayer,
 } from "../../firestore/competition";
@@ -22,7 +21,6 @@ type TCompetitionPlayersProps = {
   playersMap: TPlayersList;
   roundPlayers: TRoundPlayerList;
 };
-
 
 const getAvailablePlayersArray = (
   allPlayers: TPlayersList,
@@ -38,17 +36,16 @@ const getAvailablePlayersArray = (
   return availablePlayers;
 };
 
-
 export const CompetitionPlayers = ({
-  round, playersMap, roundPlayers
+  round,
+  playersMap,
+  roundPlayers,
 }: TCompetitionPlayersProps): ReactElement => {
   const [availabllePlayers, setAvailablePlayers] = useState([] as string[]);
 
   useEffect(() => {
     setAvailablePlayers(getAvailablePlayersArray(playersMap, roundPlayers));
   }, [playersMap, roundPlayers]);
-
-
 
   return (
     <div className="competition-players">

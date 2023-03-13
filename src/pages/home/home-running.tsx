@@ -78,7 +78,6 @@ export const HomeRunning = ({
       }
     });
 
-
     const total = players * 10;
 
     let prize: any = [];
@@ -102,7 +101,7 @@ export const HomeRunning = ({
       let one80s = 0;
       let total180 = 0;
       Object.values(roundPlayers).forEach((player) => {
-        if (player?.hf && player?.hf  > hf) {
+        if (player?.hf && player?.hf > hf) {
           hf = player.hf;
         }
         if (player?.one80s && player?.one80s > one80s) {
@@ -110,7 +109,6 @@ export const HomeRunning = ({
         }
 
         total180 += player.one80s || 0;
-
       });
       setHf(hf);
       setOne80s(one80s);
@@ -120,37 +118,45 @@ export const HomeRunning = ({
 
   return (
     <>
-      <h3>Next matches</h3>
-      <div className="matches">
-        {Object.values(competition)
-          .filter((match) => {
-            const hasBlanks =
-              match.player1 === BLANK || match.player2 === BLANK;
-            if (
-              match.player1 &&
-              match.player2 &&
-              !hasBlanks &&
-              !match.finished
-            ) {
-              return true;
-            }
-            return false;
-          })
-          .map((match) => (
-            <div
-              className="match next"
-              onClick={() => {
-                popupMatchInfo(round.round, match);
-              }}
-              key={match.number}
-            >
-              <div className="match-no">{match.number}</div>
-              <div className="p1">{playersMap[match.player1 || ""].name}</div>
-              <div className="divider">vs</div>
-              <div className="p2">{playersMap[match.player2 || ""].name}</div>
-            </div>
-          ))}
-      </div>
+      {round.status === "running" && (
+        <>
+          <h3>Next matches</h3>
+          <div className="matches">
+            {Object.values(competition)
+              .filter((match) => {
+                const hasBlanks =
+                  match.player1 === BLANK || match.player2 === BLANK;
+                if (
+                  match.player1 &&
+                  match.player2 &&
+                  !hasBlanks &&
+                  !match.finished
+                ) {
+                  return true;
+                }
+                return false;
+              })
+              .map((match) => (
+                <div
+                  className="match next"
+                  onClick={() => {
+                    popupMatchInfo(round.round, match);
+                  }}
+                  key={match.number}
+                >
+                  <div className="match-no">{match.number}</div>
+                  <div className="p1">
+                    {playersMap[match.player1 || ""].name}
+                  </div>
+                  <div className="divider">vs</div>
+                  <div className="p2">
+                    {playersMap[match.player2 || ""].name}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </>
+      )}
       <h3>Competition info</h3>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Box sx={{ minWidth: 35 }}>

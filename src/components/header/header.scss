@@ -3,11 +3,28 @@
 
   .menu-item {
     text-decoration: none;
-    color: white;
+    color: rgb(219, 30, 30);
     font-size: 20px;
     &:hover {
       color: yellow;
       border-bottom: 1px solid white;
+    }
+  }
+
+  .menu {
+    svg {
+      fill: #fff;
+    }
+
+    .MuiButtonBase-root {
+      min-width: 42px;
+      padding: 3px 4px;
+    }
+
+    a.selected {
+      svg {
+        fill: rgb(255, 255, 78);
+      }
     }
   }
 }
