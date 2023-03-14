@@ -63,7 +63,7 @@ export const CompetitionPlayers = ({
                         <IconButton
                           edge="end"
                           onClick={() => {
-                            addPlayerToRound(round.round, playerId);
+                            addPlayerToRound(2, playerId);
                           }}
                         >
                           <ArrowCircleRightIcon />
