@@ -40,12 +40,14 @@ export const HomePage = ({
   return (
     <div className="home">
       <div className="top">
-        <div className={`status ${round.status}`}>{round.status}</div>
+        <div className={`status ${round.status}`}>
+          Round {round.round} {round.status}
+        </div>
         <div className="total-players">
           {Object.keys(roundPlayers).length} players
         </div>
       </div>
-      {round.status === "running" || round.status === "completed" && (
+      {(round.status === "running" || round.status === "completed") && (
         <HomeRunning
           roundPlayers={roundPlayers}
           competition={competition}
@@ -117,7 +119,18 @@ export const HomePage = ({
                     {roundPlayers[playerId]?.rank || "-"}
                   </ListItemIcon>
                   <ListItemButton>
-                    <ListItemText primary={playersMap[playerId].name} />
+                    {playersMap[playerId].name}
+                    {roundPlayers[playerId]?.points && (
+                      <>
+                        &nbsp; - &nbsp;{" "}
+                        <b> {roundPlayers[playerId]?.points}p </b>
+                        <span className="points-info">
+                          {"("}
+                          {roundPlayers[playerId]?.basePoints} +{" "}
+                          {roundPlayers[playerId]?.bonus}%{")"}
+                        </span>
+                      </>
+                    )}
                   </ListItemButton>
                 </ListItem>
               );

@@ -1,5 +1,5 @@
 import { getRoundPlayers, startCompetition } from "../firestore/competition";
-import { Competition, FirestoreRound, Match } from "../types";
+import { Competition, FirestoreRound, Match, TResults, TRoundPlayerList } from "../types";
 import { BLANK } from "./constants";
 
 export const prizeSturcture = {
@@ -31,8 +31,8 @@ export const prizeSturcture = {
     6: 8,
     7: 6,
     8: 6,
-  }
-}
+  },
+};
 
 const nextPowerOfTwo = (num: number): number => {
   let result = 1;
@@ -47,12 +47,11 @@ const getBlanksPositions = (
   min: number,
   max: number
 ): number[] => {
-
   if (requiredBlanks > 1) {
     let b1 = Math.floor(requiredBlanks / 2);
     let b2 = Math.floor(requiredBlanks / 2);
 
-    if (requiredBlanks % 2 != 0) {
+    if (requiredBlanks % 2 !== 0) {
       if (Math.floor(Math.random() * 2) == 0) {
         b1++;
       } else {
@@ -272,10 +271,56 @@ export const getProcessedCompetition = (
       }
     } else {
       match.finished = false;
-      match.winner = '';
-      match.looser = '';
+      match.winner = "";
+      match.looser = "";
     }
   });
 
   return competition;
+};
+
+// TODO if swtich of changes listener, should read anc calculate competition results again here
+export const getPlayersStats = (roundPlayers: TRoundPlayerList): TRoundPlayerList => {
+  // const results: any = {};
+  // Object.values(competition).forEach((match) => {
+  //   if (match.finished) {
+  //     const p1 = match.player1 || "";
+  //     const p2 = match.player2 || "";
+  //     if (!results[p1]) {
+  //       results[p1] = {};
+  //     }
+  //     if (!results[p2]) {
+  //       results[p2] = {};
+  //     }
+
+  //     if (match.looserPosition) {
+  //       results[match.looser || ""].rank = match.looserPosition;
+  //     }
+  //     if (match.winnerPosition) {
+  //       results[match.winner || ""].rank = match.winnerPosition;
+  //     }
+
+  //     results[p1].one80s = results[p1].one80s
+  //       ? results[p1].one80s + (match.player1180s || 0)
+  //       : match.player1180s || 0;
+  //     results[p2].one80s = results[p2].one80s
+  //       ? results[p2].one80s + (match.player2180s || 0)
+  //       : match.player2180s || 0;
+
+  //     results[p1].hf = results[p1].hf
+  //       ? Math.max(results[p1].hf, match.player1HF || 0)
+  //       : match.player1HF || 0;
+  //     results[p2].hf = results[p2].hf
+  //       ? Math.max(results[p2].hf, match.player2HF || 0)
+  //       : match.player2HF || 0;
+  //   }
+  // });
+
+  // Object.keys(roundPlayers).forEach(k => {
+  //   roundPlayers[k].basePoints = points[roundPlayers[k]?.rank || 17] || points[17];
+  //   roundPlayers[k].bonus = 0;
+  //   roundPlayers[k].points = roundPlayers[k].basePoints;
+  // })
+
+  return roundPlayers;
 };

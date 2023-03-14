@@ -30,6 +30,7 @@ import "./App.scss";
 import { MatchInfoDialog } from "./components/match-info-dialog/match-info-dialog";
 import { LoginPage } from "./pages/login/login";
 import { UsersPage } from "./pages/users/users";
+import { StandingsPage } from "./pages/standings/standings";
 
 const emptyRound: FirestoreRound = {
   players: [],
@@ -172,6 +173,18 @@ function App() {
               playersMap={playersMap}
               usersMap={usersMap}
               showLoader={setLoaderOpen}
+            />
+          }
+        />
+        <Route
+          path="/standings"
+          element={
+            <StandingsPage
+              roundPlayers={roundPlayers}
+              competition={competition}
+              playersMap={playersMap}
+              popupMatchInfo={showMatchInfo}
+              round={round}
             />
           }
         />

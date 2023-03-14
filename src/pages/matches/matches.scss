@@ -1,12 +1,12 @@
 .matches {
-  max-width: 1200px;
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   justify-content: center;
   align-items: center;
+  padding: 0 16px;
 
   .pending-matches {
-    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     .match {
@@ -21,7 +21,6 @@
   }
 
   .finished-matches {
-    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
   }

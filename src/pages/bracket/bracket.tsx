@@ -17,10 +17,12 @@ export const BracketPage = ({
   playersMap,
   round,
 }: TBracketPage): ReactElement => {
-  console.log(round.status);
   return (
     <>
       <div className="bracket-page">
+        <div className="bracket-title">
+          <h3>Bracket</h3>
+        </div>
         {round.status === "registering" && (
           <div className="info">Round pending</div>
         )}

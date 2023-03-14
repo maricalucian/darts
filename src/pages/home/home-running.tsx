@@ -157,7 +157,7 @@ export const HomeRunning = ({
           </div>
         </>
       )}
-      <h3>Competition info</h3>
+      <h3>Round info</h3>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Box sx={{ minWidth: 35 }}>
           <Typography

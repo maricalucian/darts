@@ -19,6 +19,7 @@ export const MatchesPage = ({
 }: TMatchesPageProps): ReactElement => {
   return (
     <div className="matches">
+      <h3>Matches</h3>
       <div className="pending-matches">
         {Object.values(competition)
           .filter((match) => {

@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import "./manage.scss";
 
-import { startRound } from "../../core/competition";
+import { getPlayersStats, startRound } from "../../core/competition";
 
 type TManagePage = {
   round: FirestoreRound;
@@ -140,7 +140,7 @@ export const ManagePage = ({
               Reset competition
             </Button>
           )}
-          {round.status === "running" && (
+          {round.status === "running"  && (
             <Button
               variant="contained"
               color="success"
@@ -153,6 +153,7 @@ export const ManagePage = ({
                   // eslint-disable-next-line no-restricted-globals
                   confirm("Are you sure you want to finish the competition?")
                 ) {
+                  const roundPlayersStats = getPlayersStats(roundPlayers);
                   setRoundStatus(round.round, "completed");
                 }
               }}

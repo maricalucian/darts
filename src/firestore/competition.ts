@@ -23,6 +23,8 @@ import {
   TRoundPlayerList,
   TRoundResult,
   TRoundResults,
+  TStanding,
+  TStandings,
 } from "../types";
 import { BLANK } from "../core/constants";
 import {
@@ -97,6 +99,15 @@ export const getCurrentRoundIndex = () => {
       return data.currentRound;
     }
     return 0;
+  });
+};
+
+export const getCompetition = () => {
+  return getDoc(doc(db, "competitions", "duminica23")).then((docSnap) => {
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+    return {};
   });
 };
 
@@ -233,35 +244,6 @@ export const setRoundStatus = async (roundIndex: number, status: string) => {
   );
 };
 
-export const processCompetition = async (roundIndex: number) => {
-  return;
-
-  const competition: Competition = {};
-  const querySnapshot = await getDocs(
-    collection(db, `competitions/duminica23/rounds/${roundIndex}/matches`)
-  );
-  querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    competition[parseInt(doc.id)] = doc.data() as Match;
-  });
-
-  const processedCompetition: Competition =
-    getProcessedCompetition(competition);
-
-  const batch = writeBatch(db);
-  Object.values(processedCompetition).forEach((match) => {
-    batch.set(
-      doc(
-        db,
-        `competitions/duminica23/rounds/${roundIndex}/matches/${match.number}`
-      ),
-      match
-    );
-  });
-
-  await batch.commit();
-};
-
 // returns rounds players uid
 export const subscribeToRoundMatches = (roundIndex: number, callback: any) => {
   return onSnapshot(
@@ -343,4 +325,17 @@ export const setPlayerPaid = (
     },
     { merge: true }
   );
+};
+
+export const getStandings = async () => {
+  const standings: TStandings = {};
+  const querySnapshot = await getDocs(
+    collection(db, `competitions/duminica23/standings`)
+  );
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    standings[doc.id] = doc.data() as TStanding;
+  });
+
+  return standings;
 };

@@ -56,6 +56,9 @@ export type TRoundPlayer = {
   rank?: number;
   hf?: number;
   one80s?: number;
+  points?: number;
+  basePoints?: number;
+  bonus?: number;
 }
 
 export type TRoundPlayerList = {
@@ -85,3 +88,13 @@ export type TRoundResult = {
 export type TRoundResults = {
   [key: string]: TRoundResult;
 };
+
+export type TStanding = {
+  hf?: number;
+  one80s?: number;
+  points?: number;
+  rank?: number;
+}
+export type TStandings = {
+  [key: string]: TStanding;
+}

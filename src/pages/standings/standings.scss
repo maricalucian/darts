@@ -1,0 +1,29 @@
+.standings {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+
+  .records {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 2px 0;
+
+    .one80s {
+      background-color: #9a9a9a;
+      padding: 6px 8px;
+      border-radius: 8px;
+      color: #fff;
+    }
+
+    .hf {
+      background-color: #9a9a9a;
+      padding: 6px 8px;
+      border-radius: 8px;
+      color: #fff;
+    }
+  }
+}

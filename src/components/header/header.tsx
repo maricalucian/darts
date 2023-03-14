@@ -50,7 +50,7 @@ export const Header = ({ round, user }: HeaderProps): ReactElement => {
                 to={"/"}
                 className={`${location.pathname === "/" && "selected"}`}
               >
-                <HomeSvg style={{ height: "37px", marginTop: "0px" }} />
+                <HomeSvg style={{ height: "40px", marginTop: "0px" }} />
               </Button>
               <Button
                 color="inherit"
