@@ -26,4 +26,52 @@
       color: #fff;
     }
   }
+
+  .players {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1;
+
+      .table-header {
+        background-color: #1976d2;
+        height: 36px;
+        color: #fff;
+        font-weight: bold;
+      }
+    }
+    .player-row {
+      height: 36px;
+    }
+
+    .rank {
+      width: 30px;
+      text-align: center;
+    }
+
+    .player-bonus {
+      width: 48px;
+      text-align: center;
+    }
+
+    .player-name {
+      font-weight: bold;
+    }
+
+    .player-points {
+      width: 40px;
+      text-align: center;
+      background-color: #ffe0b6;
+    }
+
+    .player-one80s {
+      width: 40px;
+      text-align: center;
+    }
+
+    .player-hf {
+      width: 40px;
+      text-align: center;
+    }
+  }
 }

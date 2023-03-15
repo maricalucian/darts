@@ -24,19 +24,23 @@ import {
 } from "./types";
 import { ManagePage } from "./pages/manage/manage";
 import { MatchesPage } from "./pages/matches/matches";
-import {  getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import "./App.scss";
 import { MatchInfoDialog } from "./components/match-info-dialog/match-info-dialog";
 import { LoginPage } from "./pages/login/login";
 import { UsersPage } from "./pages/users/users";
 import { StandingsPage } from "./pages/standings/standings";
+import { Preloader } from "./components/preloader/preloader";
 
 const emptyRound: FirestoreRound = {
   players: [],
   round: 0,
   status: "registering",
 };
+
+const localComp = localStorage.getItem("competition");
+const funMode = localComp === "friendly";
 
 function App() {
   const [round, setRound] = useState({} as FirestoreRound);
@@ -49,6 +53,7 @@ function App() {
   const [dialogMatch, setDialogMatch] = useState({} as Match);
   const [usersMap, setUsersMap] = useState({} as { [key: string]: string });
   const [user, setUser] = useState({} as AppUser);
+  const [preloading, setPreloading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
@@ -101,12 +106,16 @@ function App() {
 
   useEffect(() => {
     getCurrentRoundIndex().then((roundIndex) => {
+      if (!roundIndex) {
+        setPreloading(false);
+      }
       setCurrentRoundIndex(roundIndex);
     });
   }, []);
 
   useEffect(() => {
     return subscribeToRound(currendRoundIndex, (data: FirestoreRound) => {
+      setPreloading(false);
       setRound(data);
     });
   }, [currendRoundIndex]);
@@ -121,92 +130,102 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <Header round={round} user={user} />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage
-              roundPlayers={roundPlayers}
-              competition={competition}
-              playersMap={playersMap}
-              popupMatchInfo={showMatchInfo}
-              round={round}
+    <>
+      {preloading && <Preloader />}
+      {!preloading && (
+        <div className="app">
+          <Header round={round} user={user} funMode={funMode} />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  roundPlayers={roundPlayers}
+                  competition={competition}
+                  playersMap={playersMap}
+                  popupMatchInfo={showMatchInfo}
+                  round={round}
+                  funMode={funMode}
+                />
+              }
             />
-          }
-        />
-        <Route
-          path="/bracket"
-          element={
-            <BracketPage round={round} competition={competition} playersMap={playersMap} />
-          }
-        />
-        <Route
-          path="/matches"
-          element={
-            <MatchesPage
-              round={round}
-              playersMap={playersMap}
-              competition={competition}
-              popupMatchInfo={showMatchInfo}
+            <Route
+              path="/bracket"
+              element={
+                <BracketPage
+                  round={round}
+                  competition={competition}
+                  playersMap={playersMap}
+                />
+              }
             />
-          }
-        />
-        <Route
-          path="/manage"
-          element={
-            <ManagePage
-              round={round}
-              playersMap={playersMap}
-              roundPlayers={roundPlayers}
-              showLoader={setLoaderOpen}
+            <Route
+              path="/matches"
+              element={
+                <MatchesPage
+                  round={round}
+                  playersMap={playersMap}
+                  competition={competition}
+                  popupMatchInfo={showMatchInfo}
+                />
+              }
             />
-          }
-        />
-        <Route path="/login" element={<LoginPage user={user} />} />
-        <Route
-          path="/users"
-          element={
-            <UsersPage
-              user={user}
-              playersMap={playersMap}
-              usersMap={usersMap}
-              showLoader={setLoaderOpen}
+            <Route
+              path="/manage"
+              element={
+                <ManagePage
+                  round={round}
+                  playersMap={playersMap}
+                  roundPlayers={roundPlayers}
+                  showLoader={setLoaderOpen}
+                />
+              }
             />
-          }
-        />
-        <Route
-          path="/standings"
-          element={
-            <StandingsPage
-              roundPlayers={roundPlayers}
-              competition={competition}
-              playersMap={playersMap}
-              popupMatchInfo={showMatchInfo}
-              round={round}
+            <Route path="/login" element={<LoginPage user={user} />} />
+            <Route
+              path="/users"
+              element={
+                <UsersPage
+                  user={user}
+                  playersMap={playersMap}
+                  usersMap={usersMap}
+                  showLoader={setLoaderOpen}
+                />
+              }
             />
-          }
-        />
-      </Routes>
+            <Route
+              path="/standings"
+              element={
+                <StandingsPage
+                  roundPlayers={roundPlayers}
+                  competition={competition}
+                  playersMap={playersMap}
+                  popupMatchInfo={showMatchInfo}
+                  round={round}
+                />
+              }
+            />
+          </Routes>
 
-      <MatchInfoDialog
-        round={round}
-        playersMap={playersMap}
-        dialogIsOpen={matchDialogIsOpen}
-        match={dialogMatch}
-        usersMap={usersMap}
-        closeDialog={closeMatchDialog}
-        uid={user.user?.uid || ""}
-      />
+          <MatchInfoDialog
+            round={round}
+            playersMap={playersMap}
+            dialogIsOpen={matchDialogIsOpen}
+            match={dialogMatch}
+            usersMap={usersMap}
+            closeDialog={closeMatchDialog}
+            uid={user.user?.uid || ""}
+          />
 
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loaderIsOpen}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    </div>
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loaderIsOpen}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        </div>
+      )}
+    </>
   );
 }
 

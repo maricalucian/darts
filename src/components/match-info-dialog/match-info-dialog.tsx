@@ -233,8 +233,7 @@ export const MatchInfoDialog = ({
             {!dialogEditMode &&
               (usersMap[uid] === match.player1 ||
                 usersMap[uid] === match.player2 ||
-                uid === uid) && (
-                // uid === ADM) && (
+                uid === ADM) && (
                 <Button
                   variant="contained"
                   color="info"
@@ -256,6 +255,9 @@ export const MatchInfoDialog = ({
                     player2180s: parseInt(results.player2180s) || 0,
                     player1HF: parseInt(results.player1HF) || 0,
                     player2HF: parseInt(results.player2HF) || 0,
+                    finished:
+                      (parseInt(results.score1) || 0) > 0 ||
+                      (parseInt(results.score2) || 0) > 0,
                   });
 
                   closeMatchDialog();

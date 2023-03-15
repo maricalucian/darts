@@ -52,7 +52,7 @@ export const CompetitionPlayers = ({
       <Box sx={{ flexGrow: 1 }} padding={1}>
         <Grid container spacing={0}>
           <Grid xs={12} sm={5} className="players-list rotate-icons">
-            <h3 style={{ textAlign: "center" }}>Available players</h3>
+            <div style={{ textAlign: "center", fontWeight: 'bold', padding: '12px 0 0' }}>Available players</div>
             <div className="list-container">
               <List>
                 {availabllePlayers.map((playerId) => {
@@ -63,7 +63,7 @@ export const CompetitionPlayers = ({
                         <IconButton
                           edge="end"
                           onClick={() => {
-                            addPlayerToRound(2, playerId);
+                            addPlayerToRound(round.round, playerId);
                           }}
                         >
                           <ArrowCircleRightIcon />
@@ -93,7 +93,7 @@ export const CompetitionPlayers = ({
             <ForwardIcon fontSize="large" color="success" />
           </Grid>
           <Grid xs={12} sm={5} className="players-list">
-            <h3 style={{ textAlign: "center" }}>Selected players</h3>
+            <div style={{ textAlign: "center", fontWeight: 'bold', padding: '12px 0 0' }}>Selected players</div>
             <div className="list-container">
               <List>
                 {Object.keys(roundPlayers).map((playerId) => {

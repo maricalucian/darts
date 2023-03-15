@@ -1,24 +1,11 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import {
   Competition,
   TPlayersList,
   FirestoreRound,
   Match,
-  TRoundResults,
-  TRoundResult,
   TRoundPlayerList,
-  TRoundPlayer,
 } from "../../types";
-import {
-  Box,
-  LinearProgress,
-  Typography,
-  ListItemText,
-  Card,
-  List,
-  ListItem,
-  CardContent,
-} from "@mui/material";
 import { BLANK } from "../../core/constants";
 
 import "./home.scss";
@@ -30,6 +17,7 @@ type THomeRunningProps = {
   round: FirestoreRound;
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
+  funMode: boolean;
 };
 
 export const HomeRunning = ({
@@ -38,6 +26,7 @@ export const HomeRunning = ({
   playersMap,
   popupMatchInfo,
   roundPlayers,
+  funMode,
 }: THomeRunningProps): ReactElement => {
   const [progress, setProgress] = useState(0);
   const [hf, setHf] = useState(0);
@@ -116,29 +105,27 @@ export const HomeRunning = ({
     }
   }, [roundPlayers, playersMap]);
 
+  const nextGames =
+    round.status === "running"
+      ? Object.values(competition).filter((match) => {
+          const hasBlanks = match.player1 === BLANK || match.player2 === BLANK;
+          if (match.player1 && match.player2 && !hasBlanks && !match.finished) {
+            return true;
+          }
+          return false;
+        })
+      : [];
+
   return (
     <>
-      {round.status === "running" && (
+      {round.status === "running" && nextGames.length > 0 && (
         <>
-          <h3>Next matches</h3>
-          <div className="matches">
-            {Object.values(competition)
-              .filter((match) => {
-                const hasBlanks =
-                  match.player1 === BLANK || match.player2 === BLANK;
-                if (
-                  match.player1 &&
-                  match.player2 &&
-                  !hasBlanks &&
-                  !match.finished
-                ) {
-                  return true;
-                }
-                return false;
-              })
-              .map((match) => (
+          <div className="box">
+            <div className="box-label">Next games</div>
+            <div className="matches">
+              {nextGames.map((match) => (
                 <div
-                  className="match next"
+                  className="match-info next"
                   onClick={() => {
                     popupMatchInfo(round.round, match);
                   }}
@@ -154,57 +141,82 @@ export const HomeRunning = ({
                   </div>
                 </div>
               ))}
+            </div>
           </div>
         </>
       )}
-      <h3>Round info</h3>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Box sx={{ minWidth: 35 }}>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-          >{`${progress}%`}</Typography>
-        </Box>
-        <Box sx={{ width: "100%" }}>
-          <LinearProgress variant="determinate" value={progress} />
-        </Box>
-      </Box>
-      <div className="competition-info">
-        <div className="stats">
-          <div className="stat">
-            <div className="stat-name">Total players</div>
-            <div className="stat-value">{Object.keys(roundPlayers).length}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-name">Most 180s</div>
-            <div className="stat-value">{one80s}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-name">Total 180s</div>
-            <div className="stat-value">{totalOne80s}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-name">Highest finish</div>
-            <div className="stat-value">{hf}</div>
-          </div>
+      <div className="box">
+        <div className="box-label">
+          {funMode && `Game info`}
+          {!funMode && `Round ${round.round} info`}
         </div>
-        <div className="prizes">
-          <Card>
-            <CardContent>
-              Prizes
-              <List>
-                {prizes.map((prize, i) => {
-                  return (
-                    <ListItem key={i} disablePadding>
-                      <ListItemText
-                        primary={`${prize.rank}. ${prize.prize} RON`}
-                      />
-                    </ListItem>
-                  );
-                })}
-              </List>
-            </CardContent>
-          </Card>
+        <div className="box-content competition-info">
+          <div className="stats">
+            <div className="info-line-big">
+              <div className="val">{Object.keys(roundPlayers).length}</div>
+              <div className="def">players</div>
+            </div>
+            <div className="info-line-big">
+              <div className="val">{one80s}</div>
+              <div className="def">180s by one player</div>
+            </div>
+            <div className="info-line-big">
+              <div className="val">{totalOne80s}</div>
+              <div className="def">180s this round</div>
+            </div>
+            <div className="info-line-big">
+              <div className="val">{hf}</div>
+              <div className="def">high out</div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div className="progress">
+                <svg
+                  id="svg"
+                  width="80"
+                  height="80"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    r="35"
+                    cx="40"
+                    cy="40"
+                    fill="transparent"
+                    strokeDasharray="219.91"
+                    strokeDashoffset="0"
+                  ></circle>
+                  <circle
+                    id="bar"
+                    r="35"
+                    cx="40"
+                    cy="40"
+                    fill="transparent"
+                    strokeDasharray="219.91"
+                    strokeDashoffset={((100 - progress) * 219.91) / 100}
+                  ></circle>
+                </svg>
+                <div className="progress-text">{progress}%</div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="box prizes inner"
+            style={{ display: "flex", flexDirection: "column" }}
+          >
+            <div className="box-label">Prize structure</div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                flex: 1,
+              }}
+            >
+              {prizes.map((prize, i) => {
+                return <div key={i}>{`${prize.rank}. ${prize.prize} RON`}</div>;
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </>

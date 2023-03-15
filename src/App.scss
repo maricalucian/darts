@@ -1,2 +1,111 @@
 .app {
 }
+
+.box {
+  background-color: #1976d2;
+  box-shadow: 1px 1px 4px 1px #7d7d7d80;
+  border-radius: 16px;
+  padding: 16px;
+  color: #fff;
+  margin-bottom: 12px;
+
+  &.green {
+    background-color: #17a13d;
+  }
+
+  &.white {
+    background-color: #fff;
+    color: #333;
+  }
+
+  &.inner {
+    background-color: #ffffffe8;
+    box-shadow: inset 0 0 10px #0000008c;
+    color: #000;
+  }
+
+  .box-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+}
+
+.info-line {
+  display: flex;
+  flex-direction: row;
+
+  .def {
+    margin-right: 4px;
+  }
+
+  .val {
+    font-weight: bold;
+  }
+}
+.info-line-big {
+  display: flex;
+  flex-direction: row;
+  margin: 2px 0;
+  align-items: center;
+
+  .def {
+    margin-left: 4px;
+  }
+
+  .val {
+    background-color: #17a13d;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: bold;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+  }
+}
+
+.match-info {
+  display: flex;
+  flex-direction: row;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+  background-color: #e8e8e8;
+  font-size: 14px;
+
+  &.next {
+    cursor: pointer;
+    background-color: #17a13d;
+
+    .match-no {
+      color: #fff;
+    }
+  }
+
+  .p1,
+  .p2 {
+    flex: 1 1 0px;
+    padding: 8px;
+    // font-weight: bold;
+  }
+
+  .divider {
+    padding: 8px 4px;
+    font-weight: bold;
+  }
+
+  .p1 {
+    text-align: right;
+  }
+
+  .match-no {
+    position: absolute;
+    color: #949494;
+    font-size: 18px;
+    line-height: 32px;
+    font-weight: 100;
+  }
+}

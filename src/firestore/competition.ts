@@ -26,20 +26,18 @@ import {
   TStanding,
   TStandings,
 } from "../types";
-import { BLANK } from "../core/constants";
-import {
-  getNextMatchOrder,
-  getProcessedCompetition,
-} from "../core/competition";
+
+const localComp = localStorage.getItem("competition");
+const tournament = localComp === 'friendly' ? 'friendly' : "duminica23";
 
 export const startNewRound = async () => {
   const currentRound = await getCurrentRoundIndex();
   const newRound = currentRound + 1;
-  const newRoundRef = doc(db, `competitions/duminica23/rounds/${newRound}`);
+  const newRoundRef = doc(db, `competitions/${tournament}/rounds/${newRound}`);
 
   try {
     await getDoc(
-      doc(db, `competitions/duminica23/rounds/${currentRound}`)
+      doc(db, `competitions/${tournament}/rounds/${currentRound}`)
     ).then((docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -60,7 +58,7 @@ export const startNewRound = async () => {
       round: newRound,
       status: "registering",
     });
-    await setDoc(doc(db, "competitions", "duminica23"), {
+    await setDoc(doc(db, "competitions", tournament), {
       currentRound: newRound,
     });
   } catch (e) {
@@ -72,7 +70,7 @@ export const getCurrentRound = async (): Promise<FirestoreRound> => {
   const currentRoundIndex = await getCurrentRoundIndex();
   const roundRef = doc(
     db,
-    `competitions/duminica23/rounds/${currentRoundIndex}`
+    `competitions/${tournament}/rounds/${currentRoundIndex}`
   );
   return getDoc(roundRef).then((docSnap) => {
     if (!docSnap.exists()) {
@@ -83,17 +81,20 @@ export const getCurrentRound = async (): Promise<FirestoreRound> => {
 };
 
 export const subscribeToRound = (roundIndex: number, callback: any) => {
-  const roundRef = doc(db, `competitions/duminica23/rounds/${roundIndex}`);
+  const roundRef = doc(db, `competitions/${tournament}/rounds/${roundIndex}`);
   return onSnapshot(roundRef, (docRef) => {
     if (docRef.exists()) {
       const data = docRef.data();
+      data.round = docRef.id;
       callback(data as FirestoreRound);
+    } else {
+      callback({} as FirestoreRound)
     }
   });
 };
 
 export const getCurrentRoundIndex = () => {
-  return getDoc(doc(db, "competitions", "duminica23")).then((docSnap) => {
+  return getDoc(doc(db, "competitions", tournament)).then((docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       return data.currentRound;
@@ -102,8 +103,9 @@ export const getCurrentRoundIndex = () => {
   });
 };
 
-export const getCompetition = () => {
-  return getDoc(doc(db, "competitions", "duminica23")).then((docSnap) => {
+export const getCompetition = (getTurn = '') => {
+  const turn = getTurn ? getTurn : tournament;
+  return getDoc(doc(db, "competitions", turn)).then((docSnap) => {
     if (docSnap.exists()) {
       return docSnap.data();
     }
@@ -131,7 +133,7 @@ export const subscribeToAllPlayers = (callback: any) => {
 // returns rounds players uid
 export const subscribeToRoundPlayers = (roundIndex: number, callback: any) => {
   return onSnapshot(
-    collection(db, `competitions/duminica23/rounds/${roundIndex}/players`),
+    collection(db, `competitions/${tournament}/rounds/${roundIndex}/players`),
     (snapshot) => {
       const players: TRoundPlayerList = {};
       snapshot.forEach((doc) => {
@@ -146,7 +148,7 @@ export const subscribeToRoundPlayers = (roundIndex: number, callback: any) => {
 export const getRoundPlayers = async (roundIndex: number) => {
   const players: TRoundPlayerList = {};
   const querySnapshot = await getDocs(
-    collection(db, `competitions/duminica23/rounds/${roundIndex}/players`)
+    collection(db, `competitions/${tournament}/rounds/${roundIndex}/players`)
   );
   querySnapshot.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
@@ -157,8 +159,9 @@ export const getRoundPlayers = async (roundIndex: number) => {
 };
 
 export const addPlayerToRound = (roundIndex: number, playerId: string) => {
+  console.log();
   return setDoc(
-    doc(db, `competitions/duminica23/rounds/${roundIndex}/players/${playerId}`),
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`),
     {
       addedAt: serverTimestamp(),
     },
@@ -168,18 +171,18 @@ export const addPlayerToRound = (roundIndex: number, playerId: string) => {
 
 export const removeRoundPlayer = (roundIndex: number, playerId: string) => {
   return deleteDoc(
-    doc(db, `competitions/duminica23/rounds/${roundIndex}/players/${playerId}`)
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`)
   );
 };
 
 export const deleteAllRoundResults = async (roundIndex: number) => {
   const querySnapshot = await getDocs(
-    collection(db, `/competitions/duminica23/rounds/${roundIndex}/players`)
+    collection(db, `/competitions/${tournament}/rounds/${roundIndex}/players`)
   );
   querySnapshot.forEach((d) => {
     // doc.data() is never undefined for query doc snapshots
     setDoc(
-      doc(db, `/competitions/duminica23/rounds/${roundIndex}/players/${d.id}`),
+      doc(db, `/competitions/${tournament}/rounds/${roundIndex}/players/${d.id}`),
       {
         paid: (d.data() && d.data().paid) || "",
       }
@@ -189,12 +192,12 @@ export const deleteAllRoundResults = async (roundIndex: number) => {
 
 export const deleteAllMatches = async (roundIndex: number) => {
   const querySnapshot = await getDocs(
-    collection(db, `/competitions/duminica23/rounds/${roundIndex}/matches`)
+    collection(db, `/competitions/${tournament}/rounds/${roundIndex}/matches`)
   );
   querySnapshot.forEach((d) => {
     // doc.data() is never undefined for query doc snapshots
     deleteDoc(
-      doc(db, `/competitions/duminica23/rounds/${roundIndex}/matches/${d.id}`)
+      doc(db, `/competitions/${tournament}/rounds/${roundIndex}/matches/${d.id}`)
     );
   });
 };
@@ -210,7 +213,7 @@ export const startCompetition = async (
     batch.set(
       doc(
         db,
-        `competitions/duminica23/rounds/${roundIndex}/matches/${match.number}`
+        `competitions/${tournament}/rounds/${roundIndex}/matches/${match.number}`
       ),
       match
     );
@@ -220,12 +223,12 @@ export const startCompetition = async (
 
   const coll = collection(
     db,
-    `competitions/duminica23/rounds/${roundIndex}/players`
+    `competitions/${tournament}/rounds/${roundIndex}/players`
   );
   const snapshot = await getCountFromServer(coll);
 
   await setDoc(
-    doc(db, `competitions/duminica23/rounds/${roundIndex}`),
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}`),
     {
       status: "running",
       totalPlayers: snapshot.data().count,
@@ -236,7 +239,7 @@ export const startCompetition = async (
 
 export const setRoundStatus = async (roundIndex: number, status: string) => {
   return await setDoc(
-    doc(db, `competitions/duminica23/rounds/${roundIndex}`),
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}`),
     {
       status: status,
     },
@@ -247,7 +250,7 @@ export const setRoundStatus = async (roundIndex: number, status: string) => {
 // returns rounds players uid
 export const subscribeToRoundMatches = (roundIndex: number, callback: any) => {
   return onSnapshot(
-    collection(db, `competitions/duminica23/rounds/${roundIndex}/matches`),
+    collection(db, `competitions/${tournament}/rounds/${roundIndex}/matches`),
     (snapshot) => {
       const competition: Competition = {};
       snapshot.forEach((doc) => {
@@ -266,7 +269,7 @@ export const updateMatchResult = async (
   await setDoc(
     doc(
       db,
-      `competitions/duminica23/rounds/${roundIndex}/matches/${matchNumber}`
+      `competitions/${tournament}/rounds/${roundIndex}/matches/${matchNumber}`
     ),
     results,
     { merge: true }
@@ -319,7 +322,7 @@ export const setPlayerPaid = (
   paid: boolean
 ) => {
   return setDoc(
-    doc(db, `competitions/duminica23/rounds/${roundIndex}/players/${playerId}`),
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`),
     {
       paid: paid,
     },

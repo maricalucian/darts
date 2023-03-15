@@ -72,6 +72,7 @@ export type TResults = {
   player2180s: number;
   player1HF: number;
   player2HF: number;
+  finished?: boolean;
 };
 
 export type AppUser = {

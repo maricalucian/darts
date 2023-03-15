@@ -28,6 +28,7 @@ type THomePageProps = {
   round: FirestoreRound;
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
+  funMode: boolean;
 };
 
 export const HomePage = ({
@@ -36,107 +37,119 @@ export const HomePage = ({
   playersMap,
   popupMatchInfo,
   roundPlayers,
+  funMode,
 }: THomePageProps): ReactElement => {
   return (
     <div className="home">
-      <div className="top">
-        <div className={`status ${round.status}`}>
-          Round {round.round} {round.status}
+      {!round?.round && (
+        <div
+          style={{ marginTop: "32px", textAlign: "center", fontWeight: "bold" }}
+        >
+          No game currently running
         </div>
-        <div className="total-players">
-          {Object.keys(roundPlayers).length} players
-        </div>
-      </div>
-      {(round.status === "running" || round.status === "completed") && (
-        <HomeRunning
-          roundPlayers={roundPlayers}
-          competition={competition}
-          playersMap={playersMap}
-          popupMatchInfo={popupMatchInfo}
-          round={round}
-        />
       )}
-      {round.status === "registering" && (
-        <HomeRegistering
-          roundPlayers={roundPlayers}
-          competition={competition}
-          playersMap={playersMap}
-          popupMatchInfo={popupMatchInfo}
-          round={round}
-        />
-      )}
-      <h3>Players</h3>
-      <div className="players">
-        <List>
-          {Object.keys(roundPlayers)
-            .sort((a, b) => {
-              if ((roundPlayers[a]?.rank || 0) > (roundPlayers[b]?.rank || 0)) {
-                return 1;
-              } else if (
-                (roundPlayers[a]?.rank || 0) < (roundPlayers[b]?.rank || 0)
-              ) {
-                return -1;
-              } else {
-                return 0;
-              }
-            })
-            .map((playerId) => {
-              return (
-                <ListItem
-                  key={playerId}
-                  secondaryAction={
-                    <IconButton
-                      edge="end"
-                      onClick={() => {
-                        if (
-                          // eslint-disable-next-line no-restricted-globals
-                          confirm(
-                            `Set ${playersMap[playerId].name} to ${
-                              roundPlayers[playerId].paid ? "NOT" : ""
-                            } PAID?`
-                          )
-                        ) {
-                          setPlayerPaid(
-                            round.round,
-                            playerId,
-                            !roundPlayers[playerId].paid
-                          );
-                        }
-                      }}
-                    >
-                      <PaidIcon
-                        style={{
-                          fill: roundPlayers[playerId].paid
-                            ? "#48b35c"
-                            : "#d0d0d0",
-                        }}
-                      />
-                    </IconButton>
+      {round?.round && (
+        <>
+          <div className="top">
+            <div className={`status ${round.status}`}>
+              {funMode && `Friendly game ${round.status}`}
+              {!funMode && `Round ${round.round} ${round.status}`}
+            </div>
+            <div className="total-players">
+              {Object.keys(roundPlayers).length} players
+            </div>
+          </div>
+          {(round.status === "running" || round.status === "completed") && (
+            <HomeRunning
+              roundPlayers={roundPlayers}
+              competition={competition}
+              playersMap={playersMap}
+              popupMatchInfo={popupMatchInfo}
+              round={round}
+              funMode
+            />
+          )}
+          {round.status === "registering" && (
+            <HomeRegistering
+              roundPlayers={roundPlayers}
+              competition={competition}
+              playersMap={playersMap}
+              popupMatchInfo={popupMatchInfo}
+              round={round}
+            />
+          )}
+          <div className="box white">
+            <div className="box-label">Players</div>
+            <div className="players">
+              {Object.keys(roundPlayers)
+                .sort((a, b) => {
+                  if (
+                    (roundPlayers[a]?.rank || 0) > (roundPlayers[b]?.rank || 0)
+                  ) {
+                    return 1;
+                  } else if (
+                    (roundPlayers[a]?.rank || 0) < (roundPlayers[b]?.rank || 0)
+                  ) {
+                    return -1;
+                  } else {
+                    return 0;
                   }
-                  disablePadding
-                >
-                  <ListItemIcon className="rank">
-                    {roundPlayers[playerId]?.rank || "-"}
-                  </ListItemIcon>
-                  <ListItemButton>
-                    {playersMap[playerId].name}
-                    {roundPlayers[playerId]?.points && (
-                      <>
-                        &nbsp; - &nbsp;{" "}
-                        <b> {roundPlayers[playerId]?.points}p </b>
-                        <span className="points-info">
-                          {"("}
-                          {roundPlayers[playerId]?.basePoints} +{" "}
-                          {roundPlayers[playerId]?.bonus}%{")"}
-                        </span>
-                      </>
-                    )}
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-        </List>
-      </div>
+                })
+                .map((playerId) => {
+                  return (
+                    <div key={playerId} className="player-row">
+                      <div className="rank">
+                        {roundPlayers[playerId]?.rank || "-"}
+                      </div>
+                      <div className="player-name">
+                        {playersMap[playerId].name}
+                      </div>
+                      <div className="player-points">
+                        {roundPlayers[playerId]?.points && (
+                          <>
+                            <b> {roundPlayers[playerId]?.points}p </b>
+                            <span className="points-info">
+                              {"("}
+                              {roundPlayers[playerId]?.basePoints} +{" "}
+                              {roundPlayers[playerId]?.bonus}%{")"}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <IconButton
+                        edge="end"
+                        onClick={() => {
+                          if (
+                            // eslint-disable-next-line no-restricted-globals
+                            confirm(
+                              `Set ${playersMap[playerId].name} to ${
+                                roundPlayers[playerId].paid ? "NOT" : ""
+                              } PAID?`
+                            )
+                          ) {
+                            setPlayerPaid(
+                              round.round,
+                              playerId,
+                              !roundPlayers[playerId].paid
+                            );
+                          }
+                        }}
+                      >
+                        <PaidIcon
+                          style={{
+                            fill: roundPlayers[playerId].paid
+                              ? "#ff9f1e"
+                              : "#ccc",
+                          }}
+                        />
+                      </IconButton>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -66,7 +66,7 @@ export const StandingsPage = ({
     if (Object.keys(playersMap).length < 1) {
       return;
     }
-    getCompetition().then((data) => {
+    getCompetition("duminica23").then((data) => {
       setRecords(data.records || {});
     });
     getStandings().then((data: TStandings) => {
@@ -88,37 +88,79 @@ export const StandingsPage = ({
 
   return (
     <div className="standings">
-      <h3>Standings</h3>
-      <div className="records">
-        <div className="one80s">
-          {records?.one80s} 180s{" "}
-          {(records.one80sPlayers || []).map((player: any) => {
-            return playersMap?.[player.player]?.name;
-          })}
-        </div>
-        <div className="hf">
-          {records?.hf} HF{" "}
-          {(records.hfPlayers || []).map((player: any) => {
-            return `${playersMap?.[player.player]?.name} (round ${
-              player.round
-            })`;
-          })}
+      <div className="box">
+        <div className="box-label">Tournament info</div>
+        <div className="stats">
+          <div className="info-line-big">
+            <div className="val">{records?.one80s}</div>
+            <div className="def">
+              180's by{" "}
+              {(records.one80sPlayers || []).map((player: any) => {
+                return playersMap?.[player.player]?.name;
+              })}
+            </div>
+          </div>
+          <div className="info-line-big">
+            <div className="val">{records?.hf}</div>
+            <div className="def">
+              HF by{" "}
+              {(records.hfPlayers || []).map((player: any) => {
+                return `${playersMap?.[player.player]?.name} (round ${
+                  player.round
+                })`;
+              })}
+            </div>
+          </div>
+          <div className="info-line-big">
+            <div className="val">70</div>
+            <div className="def">masters pool</div>
+          </div>
         </div>
       </div>
-      <div style={{ width: "100%", marginBottom: "24px" }}>
-        {standings.length > 0 && (
-          <DataGrid
-            rows={standings}
-            columns={columns}
-            autoHeight
-            hideFooter={true}
-            initialState={{
-              sorting: {
-                sortModel: [{ field: "points", sort: "desc" }],
-              },
-            }}
-          />
-        )}
+      <div className="box white">
+        <div className="box-label">Standings</div>
+        <div className="players">
+          <table>
+            <tbody>
+              <tr className="table-header">
+                <td className="rank">#</td>
+                <td className="player-bonus">B</td>
+                <td className="player-name">Name</td>
+                <td style={{ textAlign: "center" }}>P</td>
+                <td className="player-one80s">180</td>
+                <td className="player-hf">HF</td>
+              </tr>
+              {standings
+                .sort((a: any, b: any) => {
+                  if ((a?.rank || 0) > (b?.rank || 0)) {
+                    return 1;
+                  } else if ((a?.rank || 0) < (b?.rank || 0)) {
+                    return -1;
+                  } else {
+                    return 0;
+                  }
+                })
+                .map((player: any) => {
+                  return (
+                    <tr key={player.id} className="player-row">
+                      <td className="rank">{player?.rank || "-"}</td>
+                      <td className="player-bonus">{player.bonus}</td>
+                      <td className="player-name">
+                        {playersMap[player.id].name}
+                      </td>
+                      <td className="player-points">{player.points}</td>
+                      <td className="player-one80s">
+                        {player.one80s ? player.one80s : ""}
+                      </td>
+                      <td className="player-hf">
+                        {player.hf ? player.hf : ""}
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

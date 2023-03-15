@@ -13,6 +13,10 @@ import { ReactComponent as DartSvg } from "../../icons/dart.svg";
 import { ReactComponent as TournamentSvg } from "../../icons/tournament.svg";
 import { ReactComponent as HomeSvg } from "../../icons/home.svg";
 import { ReactComponent as CupSvg } from "../../icons/cup.svg";
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import RocketIcon from '@mui/icons-material/Rocket';
 
 import "./header.scss";
 import { ADM } from "../../core/constants";
@@ -20,9 +24,20 @@ import { ADM } from "../../core/constants";
 type HeaderProps = {
   round: FirestoreRound;
   user: AppUser;
+  funMode: boolean;
 };
 
-export const Header = ({ round, user }: HeaderProps): ReactElement => {
+const switchToFriendlyMode = (fun: boolean) => {
+  if (fun) {
+    localStorage.setItem("competition", "friendly");
+  } else {
+    localStorage.setItem("competition", "duminica23");
+  }
+
+  window.location.reload();
+};
+
+export const Header = ({ round, user, funMode }: HeaderProps): ReactElement => {
   const [currentEdition, setCurrentEdition] = useState(0);
   const location = useLocation();
 
@@ -41,7 +56,9 @@ export const Header = ({ round, user }: HeaderProps): ReactElement => {
   return (
     <div className="header">
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
+        <AppBar position="static" sx={{
+          backgroundColor: funMode ? '#17a13d' : '#1976d2'
+        }}>
           <Toolbar>
             <div className="menu" style={{ flex: 1 }}>
               <Button
@@ -77,6 +94,19 @@ export const Header = ({ round, user }: HeaderProps): ReactElement => {
                 }`}
               >
                 <CupSvg style={{ height: "26px", marginTop: "0px" }} />
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => {
+                  switchToFriendlyMode(!funMode);
+                }}
+              >
+                {funMode && (
+                  <RocketIcon style={{ fontSize: "34px" }} />
+                )}
+                {!funMode && (
+                  <RocketLaunchIcon style={{ fontSize: "34px" }} />
+                )}
               </Button>
               {user.user?.uid === ADM && (
                 <>

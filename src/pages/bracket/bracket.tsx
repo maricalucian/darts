@@ -21,7 +21,7 @@ export const BracketPage = ({
     <>
       <div className="bracket-page">
         <div className="bracket-title">
-          <h3>Bracket</h3>
+          <div className="title-text">Fixtures</div>
         </div>
         {round.status === "registering" && (
           <div className="info">Round pending</div>

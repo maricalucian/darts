@@ -18,10 +18,62 @@ import {
   DialogContentText,
   TextField,
   DialogActions,
+  Box,
+  LinearProgress,
+  Typography,
+  ListItemText,
+  Card,
+  CardHeader,
+  List,
+  ListItem,
+  CardContent,
 } from "@mui/material";
 import "./manage.scss";
 
 import { getPlayersStats, startRound } from "../../core/competition";
+
+const confirmStartRound = (round: FirestoreRound) => {
+  if (
+    // eslint-disable-next-line no-restricted-globals
+    confirm("Are you sure you want to delete all matches and restart round?")
+  ) {
+    if (
+      // eslint-disable-next-line no-restricted-globals
+      confirm("All progress will be lost!")
+    ) {
+      startRound(round).then(() => {
+        deleteAllRoundResults(round.round);
+      });
+    }
+  }
+};
+
+const onResetRound = (round: FirestoreRound) => {
+  if (
+    // eslint-disable-next-line no-restricted-globals
+    confirm(
+      "Are you sure you want to delete all matches and go in registering mode?"
+    )
+  ) {
+    if (
+      // eslint-disable-next-line no-restricted-globals
+      confirm("All progress will be lost!")
+    ) {
+      deleteAllMatches(round.round);
+      deleteAllRoundResults(round.round);
+      setRoundStatus(round.round, "registering");
+    }
+  }
+};
+
+const onChangeRoundStatus = (round: FirestoreRound, status: string) => {
+  if (
+    // eslint-disable-next-line no-restricted-globals
+    confirm(`Are you sure you want to set status to ${status}?`)
+  ) {
+    setRoundStatus(round.round, status);
+  }
+};
 
 type TManagePage = {
   round: FirestoreRound;
@@ -48,148 +100,151 @@ export const ManagePage = ({
 
   return (
     <div className="manage">
-      <div className="tools">
-        <div className="stats">
-          Total players: {Object.keys(playersMap).length} <br />
-          Competition players: {Object.keys(roundPlayers).length}
-          <br />
-          Competition status: {round.status}
-        </div>
-        <div className="actions">
-          <Button
-            variant="contained"
-            sx={{
-              marginBottom: 1,
-            }}
-            onClick={() => {
-              setModalIsOpen(true);
-            }}
-          >
-            Add player
-          </Button>
-          {round.status === "registering" && (
+      <div className="box">
+        <div className="box-label">Competition</div>
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 1 }}>
+            <div className="info-line">
+              <div className="def">Total players:</div>
+              <div className="val">{Object.keys(playersMap).length}</div>
+            </div>
+          </div>
+
+          <div className="actions">
             <Button
               variant="contained"
-              color="success"
-              sx={{
-                marginLeft: 1,
-                marginBottom: 1,
-              }}
+              color="warning"
               onClick={() => {
-                startRound(round);
+                setModalIsOpen(true);
               }}
             >
-              Start competition
+              Add player
             </Button>
-          )}
-          {round.status === "running" && (
-            <Button
-              variant="contained"
-              color="error"
-              sx={{
-                marginLeft: 1,
-                marginBottom: 1,
-              }}
-              onClick={() => {
-                if (
-                  // eslint-disable-next-line no-restricted-globals
-                  confirm(
-                    "Are you sure you want to delete all matches and restart round?"
-                  )
-                ) {
+          </div>
+        </div>
+      </div>
+      <div className="box white">
+        <div className="box-label">Round</div>
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <div style={{ flex: 1 }}>
+            <div className="info-line">
+              <div className="def">Competition players:</div>
+              <div className="val">{Object.keys(roundPlayers).length}</div>
+            </div>
+            <div className="info-line">
+              <div className="def">Competition status:</div>
+              <div className="val">{round.status || "none"}</div>
+            </div>
+          </div>
+
+          <div className="actions">
+            {(round?.status === "completed" || !round?.status) && (
+              <Button
+                variant="contained"
+                color="success"
+                sx={{
+                  marginBottom: 1,
+                }}
+                onClick={() => {
                   if (
                     // eslint-disable-next-line no-restricted-globals
-                    confirm("All progress will be lost!")
+                    confirm(`Are you sure you want start a new round?`)
                   ) {
-                    startRound(round).then(() => {
-                      deleteAllRoundResults(round.round);
+                    startNewRound().then(() => {
+                      window.location.reload();
                     });
                   }
-                }
-              }}
-            >
-              Restart competition
-            </Button>
-          )}
-          {round.status === "running" && (
-            <Button
-              variant="contained"
-              color="error"
-              sx={{
-                marginLeft: 1,
-                marginBottom: 1,
-              }}
-              onClick={() => {
-                if (
-                  // eslint-disable-next-line no-restricted-globals
-                  confirm(
-                    "Are you sure you want to delete all matches and go in registering mode?"
-                  )
-                ) {
+                }}
+              >
+                Create new Round
+              </Button>
+            )}
+            {round.status === "registering" && (
+              <Button
+                variant="contained"
+                color="success"
+                sx={{
+                  marginBottom: 1,
+                }}
+                onClick={() => {
                   if (
                     // eslint-disable-next-line no-restricted-globals
-                    confirm("All progress will be lost!")
+                    confirm(`Are you sure you want start this round?`)
                   ) {
-                    deleteAllMatches(round.round);
-                    deleteAllRoundResults(round.round);
-                    setRoundStatus(round.round, "registering");
+                    startRound(round);
                   }
-                }
-              }}
-            >
-              Reset competition
-            </Button>
-          )}
-          {round.status === "running"  && (
-            <Button
-              variant="contained"
-              color="success"
-              sx={{
-                marginLeft: 1,
-                marginBottom: 1,
-              }}
-              onClick={() => {
-                if (
-                  // eslint-disable-next-line no-restricted-globals
-                  confirm("Are you sure you want to finish the competition?")
-                ) {
-                  const roundPlayersStats = getPlayersStats(roundPlayers);
-                  setRoundStatus(round.round, "completed");
-                }
-              }}
-            >
-              Finish competition
-            </Button>
-          )}
-          {round.status === "completed" && (
-            <Button
-              variant="contained"
-              color="error"
-              sx={{
-                marginLeft: 1,
-                marginBottom: 1,
-              }}
-              onClick={() => {
-                if (
-                  // eslint-disable-next-line no-restricted-globals
-                  confirm("Are you sure you want set competition to running?")
-                ) {
-                  setRoundStatus(round.round, "running");
-                }
-              }}
-            >
-              Set to running
-            </Button>
-          )}
+                }}
+              >
+                Start
+              </Button>
+            )}
+            {round.status === "running" && (
+              <Button
+                variant="contained"
+                color="success"
+                sx={{
+                  marginBottom: 1,
+                }}
+                onClick={() => {
+                  onChangeRoundStatus(round, "completed");
+                }}
+              >
+                Finish
+              </Button>
+            )}
+            {round.status === "completed" && (
+              <Button
+                variant="contained"
+                color="error"
+                sx={{
+                  marginBottom: 1,
+                }}
+                onClick={() => {
+                  onChangeRoundStatus(round, "running");
+                }}
+              >
+                Set to running
+              </Button>
+            )}
+            {round.status === "running" && (
+              <Button
+                color="error"
+                sx={{
+                  marginBottom: 1,
+                }}
+                onClick={() => {
+                  confirmStartRound(round);
+                }}
+              >
+                Restart
+              </Button>
+            )}
+            {round.status === "running" && (
+              <Button
+                color="error"
+                sx={{
+                  marginBottom: 1,
+                }}
+                onClick={() => {
+                  onResetRound(round);
+                }}
+              >
+                Reset
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       {round.status === "registering" && (
-        <CompetitionPlayers
-          round={round}
-          playersMap={playersMap}
-          roundPlayers={roundPlayers}
-        />
+        <div className="box white">
+          <div className="box-label">Players</div>
+          <CompetitionPlayers
+            round={round}
+            playersMap={playersMap}
+            roundPlayers={roundPlayers}
+          />
+        </div>
       )}
 
       <Dialog open={modalIsOpen} onClose={closeModal} fullWidth={true}>
