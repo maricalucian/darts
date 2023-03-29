@@ -3,7 +3,16 @@ import { Routes, Route } from "react-router-dom";
 import { Header } from "./components/header/header";
 import { BracketPage } from "./pages/bracket/bracket";
 import { HomePage } from "./pages/home/home";
-import { Backdrop } from "@mui/material";
+import {
+  Backdrop,
+  Divider,
+  Drawer,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  MenuList,
+  Typography,
+} from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   getCurrentRoundIndex,
@@ -32,6 +41,12 @@ import { LoginPage } from "./pages/login/login";
 import { UsersPage } from "./pages/users/users";
 import { StandingsPage } from "./pages/standings/standings";
 import { Preloader } from "./components/preloader/preloader";
+import {
+  Cloud,
+  ContentCopy,
+  ContentCut,
+  ContentPaste,
+} from "@mui/icons-material";
 
 const emptyRound: FirestoreRound = {
   players: [],
@@ -54,7 +69,6 @@ function App() {
   const [usersMap, setUsersMap] = useState({} as { [key: string]: string });
   const [user, setUser] = useState({} as AppUser);
   const [preloading, setPreloading] = useState(true);
-
   useEffect(() => {
     const auth = getAuth();
     return onAuthStateChanged(auth, (authUser) => {
@@ -154,6 +168,7 @@ function App() {
               element={
                 <BracketPage
                   round={round}
+                  playerId={user.loggedIn ? usersMap[user.user?.uid || ""] || "" : ""}
                   competition={competition}
                   playersMap={playersMap}
                 />

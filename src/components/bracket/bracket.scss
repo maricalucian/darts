@@ -1,20 +1,99 @@
-.bracket-svg {
-  text {
-    dominant-baseline: middle;
-    text-anchor: middle;
+.bracket-comp {
+  .bracket-svg {
+    text {
+      dominant-baseline: middle;
+      text-anchor: middle;
 
-    &.info {
-      font-style: italic;
-      fill: #aaa;
+      &.info {
+        font-style: italic;
+        fill: #aaa;
+      }
+
+      &.winner {
+        font-weight: bold;
+      }
+
+      &.score {
+        fill: #fff;
+        font-weight: bold;
+      }
     }
 
-    &.winner {
-      font-weight: bold;
+    &.scale-0 {
+      text {
+        font-size: 10px;
+      }
+    }
+    &.scale-1 {
+      text {
+        font-size: 12px;
+      }
+    }
+    &.scale-2 {
+      text {
+        font-size: 13px;
+      }
+    }
+  }
+
+  .action-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    // background-color: #fff;
+
+    .locate {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      margin-bottom: -14px;
     }
 
-    &.score {
-      fill: #fff;
-      font-weight: bold;
+    .scale {
+      display: flex;
+      align-items: center;
+
+      .scale-line {
+        display: flex;
+      }
+
+      .scale-option {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 4px solid #666;
+        background-color: #fff;
+        margin: 0 4px;
+        &:after {
+          content: "";
+          display: block;
+          margin-top: 6px;
+          margin-left: 16px;
+          width: 12px;
+          height: 4px;
+          background-color: #666;
+          position: absolute;
+        }
+
+        &.scale-first {
+        }
+        &.scale-middle {
+        }
+        &.scale-last {
+          &:after {
+            content: none;
+          }
+        }
+
+        .selected {
+          background-color: #666;
+          position: absolute;
+          height: 10px;
+          width: 10px;
+          border-radius: 50%;
+          margin: 3px;
+        }
+      }
     }
   }
 }
