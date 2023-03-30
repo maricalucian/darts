@@ -159,7 +159,6 @@ export const getRoundPlayers = async (roundIndex: number) => {
 };
 
 export const addPlayerToRound = (roundIndex: number, playerId: string) => {
-  console.log();
   return setDoc(
     doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`),
     {

@@ -20,8 +20,6 @@ type IMatchPositions = { [key: number]: ICoords };
 
 let playerPosition = [0, 0];
 
-console.log(window.innerHeight);
-
 const goToPosition = () => {
   window.scrollTo({
     top: playerPosition[1] - window.innerHeight / 2 + 100,
@@ -120,7 +118,8 @@ const drawMatch = (
   playersMap: TPlayersList,
   selected: string,
   setSelected: (s: string) => void,
-  dimensions: any
+  dimensions: any,
+  rightbracketHeight: number
 ) => {
   const { matchWidth, matchHeight, scoreBoxWidth } = dimensions;
   const hasBlanks = match.player1 === BLANK || match.player2 === BLANK;
@@ -185,7 +184,6 @@ const drawMatch = (
       <g
         onClick={() => {
           if (match.player1 !== BLANK) {
-            console.log(match.player1);
             setSelected(match.player1 || "");
           }
         }}
@@ -316,6 +314,53 @@ const drawMatch = (
           </text>
         </>
       )}
+      {/* game position info */}
+      {match.location === "right" && match.totalInColumn === 4 && (
+        <text
+          x={x - matchWidth / 2 + 4}
+          y={y - matchHeight / 2 - 4}
+          className="round-info"
+        >
+          Quarterfinal on right
+        </text>
+      )}
+      {match.location === "right" && match.totalInColumn === 2 && (
+        <text
+          x={x - matchWidth / 2 + 4}
+          y={y - matchHeight / 2 - 4}
+          className="round-info"
+        >
+          Semifinal on right
+        </text>
+      )}
+      {match.location === "right" && match.totalInColumn === 1 && (
+        <text
+          x={x - matchWidth / 2 + 4}
+          y={y - matchHeight / 2 - 4}
+          className="round-info"
+        >
+          Final on right
+        </text>
+      )}
+      {match.location === "final" && (
+        <text
+          x={x - matchWidth / 2 + 4}
+          y={y - matchHeight / 2 - 4}
+          className="round-info"
+        >
+          Final
+        </text>
+      )}
+      {(match.location === "left" || match.location === "newcomers") && (
+        <text
+          x={x - matchWidth / 2 + 4}
+          y={y - matchHeight / 2 - 4}
+          className="round-info"
+        >
+          {match.looserPosition}
+          {match.looserPosition === 3 ? "rd" : "th"}
+        </text>
+      )}
     </React.Fragment>
   );
 };
@@ -359,11 +404,8 @@ const getMatchYPos = (
   dimensions: any
 ): number => {
   const { matchHeight, matchVerticalSpacing } = dimensions;
-  const bracketHeight =
-    margin +
-    seedMatches * (matchHeight + matchVerticalSpacing) -
-    matchVerticalSpacing +
-    margin;
+  const gameBracketHeight = seedMatches * (matchHeight + matchVerticalSpacing);
+  const bracketHeight = 2 * margin + gameBracketHeight - matchVerticalSpacing;
   const leftBracketHeight =
     margin +
     (seedMatches / 2) * (matchHeight + matchVerticalSpacing) -
@@ -378,8 +420,10 @@ const getMatchYPos = (
       );
     case "right":
       return (
-        (bracketHeight * (match.indexInColumn * 2 + 1)) /
-        (match.totalInColumn * 2)
+        margin +
+        (gameBracketHeight * (match.indexInColumn + 0.5)) /
+          match.totalInColumn -
+        matchVerticalSpacing / 2
       );
     case "left":
       return (
@@ -430,8 +474,14 @@ const drawBracket = (
     dimensions
   );
 
+  const gameBracketHeight =
+    Math.pow(2, rounds - 1) *
+    (dimensions.matchHeight + dimensions.matchVerticalSpacing);
+  const rightbracketHeight =
+    2 * margin + gameBracketHeight - dimensions.matchVerticalSpacing;
+
   // populate aditional info an calculate last match for player
-  Object.values(competition).map((match) => {
+  Object.values(competition).forEach((match) => {
     if (
       playerId &&
       (match.player1 === playerId || match.player2 === playerId)
@@ -475,7 +525,8 @@ const drawBracket = (
           playersMap,
           selected,
           setSelected,
-          dimensions
+          dimensions,
+          rightbracketHeight
         );
       })}
     </>
@@ -488,7 +539,7 @@ export const Bracket = ({
   playerId,
 }: IBracketType): ReactElement => {
   const [selected, setSelected] = useState(playerId);
-  const [scale, setScale] = useState(2);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     setSelected(playerId);
@@ -539,22 +590,6 @@ export const Bracket = ({
               )}
             </svg>
             <div className="action-button">
-              <div className="locate">
-                <IconButton
-                  onClick={() => {
-                    setSelected(playerId);
-                    goToPosition();
-                  }}
-                >
-                  <GpsFixedIcon
-                    style={{
-                      fontSize: "36px",
-                      color: "#666",
-                      marginRight: "7px",
-                    }}
-                  />
-                </IconButton>
-              </div>
               <div className="scale">
                 <IconButton
                   onClick={() => {
@@ -566,7 +601,7 @@ export const Bracket = ({
                   <ZoomOutIcon
                     style={{
                       fontSize: "42px",
-                      color: "#666",
+                      color: "#555",
                       marginRight: "-14px",
                       marginTop: "8px",
                     }}
@@ -608,9 +643,28 @@ export const Bracket = ({
                   <ZoomInIcon
                     style={{
                       fontSize: "42px",
-                      color: "#666",
+                      color: "#555",
                       marginLeft: "-6px",
                       marginTop: "8px",
+                    }}
+                  />
+                </IconButton>
+              </div>
+            </div>
+            <div className="locate">
+              <div className="locate-button">
+                <IconButton
+                  onClick={() => {
+                    setSelected(playerId);
+                    goToPosition();
+                  }}
+                >
+                  <GpsFixedIcon
+                    style={{
+                      fontSize: "36px",
+                      color: "#555",
+                      marginLeft: "-4px",
+                      marginTop: "-4px",
                     }}
                   />
                 </IconButton>
