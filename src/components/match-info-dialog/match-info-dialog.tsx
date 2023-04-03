@@ -9,7 +9,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import "./match-info-dialog.scss";
-import { FirestoreRound, Match, TPlayersList } from "../../types";
+import { FirestoreRound, Match, TPlayersList, TTeams } from "../../types";
 import { updateMatchResult } from "../../firestore/competition";
 import { ADM } from "../../core/constants";
 
@@ -20,6 +20,7 @@ type TMatchInfoProps = {
   usersMap: { [key: string]: string };
   match: Match;
   uid: string;
+  teams: TTeams;
   closeDialog: () => void;
 };
 
@@ -32,6 +33,29 @@ type TResultsString = {
   player2HF: string;
 };
 
+const getShortenedName = (name: string): string => {
+  const parts = name.split(" ");
+  return `${parts[1]} ${parts[0][0]}`;
+};
+
+const getPlayerName = (
+  playersMap: TPlayersList,
+  teams: TTeams,
+  playerId: string,
+  isPairs: boolean
+): ReactElement | string => {
+  if (isPairs) {
+    return (
+      <>
+        <div>{getShortenedName(playersMap[playerId]?.name)}</div>
+        <div>{getShortenedName(playersMap[teams[playerId]?.p2]?.name)}</div>
+      </>
+    );
+  }
+
+  return playersMap[playerId]?.name;
+};
+
 export const MatchInfoDialog = ({
   round,
   dialogIsOpen,
@@ -40,6 +64,7 @@ export const MatchInfoDialog = ({
   playersMap,
   usersMap,
   uid,
+  teams,
 }: TMatchInfoProps): ReactElement => {
   const [dialogEditMode, setDialogEditMode] = useState(false);
   const [results, setResults] = useState({
@@ -112,11 +137,21 @@ export const MatchInfoDialog = ({
             <div className="match-result">
               <div className="result-line">
                 <div className="stat left name">
-                  {playersMap[match.player1 || ""].name}
+                  {getPlayerName(
+                    playersMap,
+                    teams,
+                    match.player1 || "",
+                    round.type === "teams"
+                  )}
                 </div>
                 <div className="delimiter"></div>
                 <div className="stat  name">
-                  {playersMap[match.player2 || ""].name}
+                  {getPlayerName(
+                    playersMap,
+                    teams,
+                    match.player2 || "",
+                    round.type === "teams"
+                  )}
                 </div>
               </div>
               <div className="result-line">

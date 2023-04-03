@@ -20,6 +20,7 @@ import {
   subscribeToRound,
   subscribeToRoundMatches,
   subscribeToRoundPlayers,
+  subscribeToRoundTeams,
   subscribeToUsersMap,
 } from "./firestore/competition";
 import {
@@ -30,6 +31,7 @@ import {
   TPlayersList,
   TRoundPlayerList,
   TRoundResults,
+  TTeams,
 } from "./types";
 import { ManagePage } from "./pages/manage/manage";
 import { MatchesPage } from "./pages/matches/matches";
@@ -62,6 +64,7 @@ function App() {
   const [currendRoundIndex, setCurrentRoundIndex] = useState(0);
   const [playersMap, setPlayersMap] = useState({} as TPlayersList);
   const [roundPlayers, setRoundPlayers] = useState({} as TRoundPlayerList);
+  const [teams, setRoundTeams] = useState({} as TTeams);
   const [competition, setCompetition] = useState({} as Competition);
   const [loaderIsOpen, setLoaderOpen] = useState(false);
   const [matchDialogIsOpen, setMatchDialogOpen] = useState(false);
@@ -113,6 +116,15 @@ function App() {
     if (!round.round) {
       return;
     }
+    return subscribeToRoundTeams(round.round, (data: TTeams) => {
+      setRoundTeams(data);
+    });
+  }, [round.round]);
+
+  useEffect(() => {
+    if (!round.round) {
+      return;
+    }
     return subscribeToRoundMatches(round.round, (data: Competition) => {
       setCompetition(data);
     });
@@ -155,6 +167,7 @@ function App() {
               element={
                 <HomePage
                   roundPlayers={roundPlayers}
+                  teams={teams}
                   competition={competition}
                   playersMap={playersMap}
                   popupMatchInfo={showMatchInfo}
@@ -168,7 +181,10 @@ function App() {
               element={
                 <BracketPage
                   round={round}
-                  playerId={user.loggedIn ? usersMap[user.user?.uid || ""] || "" : ""}
+                  teams={teams}
+                  playerId={
+                    user.loggedIn ? usersMap[user.user?.uid || ""] || "" : ""
+                  }
                   competition={competition}
                   playersMap={playersMap}
                 />
@@ -179,6 +195,7 @@ function App() {
               element={
                 <MatchesPage
                   round={round}
+                  teams={teams}
                   playersMap={playersMap}
                   competition={competition}
                   popupMatchInfo={showMatchInfo}
@@ -190,6 +207,7 @@ function App() {
               element={
                 <ManagePage
                   round={round}
+                  teams={teams}
                   playersMap={playersMap}
                   roundPlayers={roundPlayers}
                   showLoader={setLoaderOpen}
@@ -223,6 +241,7 @@ function App() {
           </Routes>
 
           <MatchInfoDialog
+            teams={teams}
             round={round}
             playersMap={playersMap}
             dialogIsOpen={matchDialogIsOpen}

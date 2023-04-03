@@ -25,12 +25,13 @@ import {
   TRoundResults,
   TStanding,
   TStandings,
+  TTeams,
 } from "../types";
 
 const localComp = localStorage.getItem("competition");
-const tournament = localComp === 'friendly' ? 'friendly' : "duminica23";
+const tournament = localComp === "friendly" ? "friendly" : "duminica23";
 
-export const startNewRound = async () => {
+export const startNewRound = async (teams: boolean = false) => {
   const currentRound = await getCurrentRoundIndex();
   const newRound = currentRound + 1;
   const newRoundRef = doc(db, `competitions/${tournament}/rounds/${newRound}`);
@@ -41,7 +42,7 @@ export const startNewRound = async () => {
     ).then((docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (data.status !== "finished") {
+        if (data.status !== "completed") {
           alert("Please complete previous round before starting another");
           throw new Error("Previous round not completed");
         }
@@ -56,6 +57,7 @@ export const startNewRound = async () => {
     });
     await setDoc(newRoundRef, {
       round: newRound,
+      type: teams ? "teams" : "",
       status: "registering",
     });
     await setDoc(doc(db, "competitions", tournament), {
@@ -88,7 +90,7 @@ export const subscribeToRound = (roundIndex: number, callback: any) => {
       data.round = docRef.id;
       callback(data as FirestoreRound);
     } else {
-      callback({} as FirestoreRound)
+      callback({} as FirestoreRound);
     }
   });
 };
@@ -103,7 +105,7 @@ export const getCurrentRoundIndex = () => {
   });
 };
 
-export const getCompetition = (getTurn = '') => {
+export const getCompetition = (getTurn = "") => {
   const turn = getTurn ? getTurn : tournament;
   return getDoc(doc(db, "competitions", turn)).then((docSnap) => {
     if (docSnap.exists()) {
@@ -144,6 +146,24 @@ export const subscribeToRoundPlayers = (roundIndex: number, callback: any) => {
   );
 };
 
+// returns rounds teams
+export const subscribeToRoundTeams = (roundIndex: number, callback: any) => {
+  return onSnapshot(
+    collection(db, `competitions/${tournament}/rounds/${roundIndex}/teams`),
+    (snapshot) => {
+      const teams: TTeams = {};
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        teams[doc.id] = {
+          p1: data?.p1,
+          p2: data?.p2,
+        };
+      });
+      callback(teams);
+    }
+  );
+};
+
 // return an map of players
 export const getRoundPlayers = async (roundIndex: number) => {
   const players: TRoundPlayerList = {};
@@ -158,9 +178,29 @@ export const getRoundPlayers = async (roundIndex: number) => {
   return players;
 };
 
+// return an map of teams
+export const getRoundTeams = async (roundIndex: number) => {
+  const teams: TTeams = {};
+  const querySnapshot = await getDocs(
+    collection(db, `competitions/${tournament}/rounds/${roundIndex}/teams`)
+  );
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    teams[doc.id] = {
+      p1: data?.p1,
+      p2: data?.p2,
+    };
+  });
+
+  return teams;
+};
+
 export const addPlayerToRound = (roundIndex: number, playerId: string) => {
   return setDoc(
-    doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`),
+    doc(
+      db,
+      `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`
+    ),
     {
       addedAt: serverTimestamp(),
     },
@@ -168,9 +208,37 @@ export const addPlayerToRound = (roundIndex: number, playerId: string) => {
   );
 };
 
+export const createRoundTeam = async (
+  roundIndex: number,
+  p1Id: string,
+  p2Id: string
+) => {
+  await addPlayerToRound(roundIndex, p1Id);
+  return setDoc(
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}/teams/${p1Id}`),
+    {
+      p1: p1Id,
+      p2: p2Id,
+      createdAt: serverTimestamp(),
+    }
+  );
+};
+
 export const removeRoundPlayer = (roundIndex: number, playerId: string) => {
   return deleteDoc(
-    doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`)
+    doc(
+      db,
+      `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`
+    )
+  );
+};
+
+export const disbandTeam = async (roundIndex: number, teamId: string) => {
+  await deleteDoc(
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${teamId}`)
+  );
+  return deleteDoc(
+    doc(db, `competitions/${tournament}/rounds/${roundIndex}/teams/${teamId}`)
   );
 };
 
@@ -181,7 +249,10 @@ export const deleteAllRoundResults = async (roundIndex: number) => {
   querySnapshot.forEach((d) => {
     // doc.data() is never undefined for query doc snapshots
     setDoc(
-      doc(db, `/competitions/${tournament}/rounds/${roundIndex}/players/${d.id}`),
+      doc(
+        db,
+        `/competitions/${tournament}/rounds/${roundIndex}/players/${d.id}`
+      ),
       {
         paid: (d.data() && d.data().paid) || "",
       }
@@ -196,7 +267,10 @@ export const deleteAllMatches = async (roundIndex: number) => {
   querySnapshot.forEach((d) => {
     // doc.data() is never undefined for query doc snapshots
     deleteDoc(
-      doc(db, `/competitions/${tournament}/rounds/${roundIndex}/matches/${d.id}`)
+      doc(
+        db,
+        `/competitions/${tournament}/rounds/${roundIndex}/matches/${d.id}`
+      )
     );
   });
 };
@@ -232,6 +306,14 @@ export const startCompetition = async (
       status: "running",
       totalPlayers: snapshot.data().count,
     },
+    { merge: true }
+  );
+};
+
+export const updateRoundInfo = (round: FirestoreRound, info: any) => {
+  return setDoc(
+    doc(db, `competitions/${tournament}/rounds/${round.round}`),
+    info,
     { merge: true }
   );
 };
@@ -321,7 +403,10 @@ export const setPlayerPaid = (
   paid: boolean
 ) => {
   return setDoc(
-    doc(db, `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`),
+    doc(
+      db,
+      `competitions/${tournament}/rounds/${roundIndex}/players/${playerId}`
+    ),
     {
       paid: paid,
     },

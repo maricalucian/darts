@@ -7,7 +7,7 @@ export type MatchLocation = "seed" | "right" | "left" | "newcomers" | "final";
 export type MatchStats = {
   highFinishPlayer1: number;
   highFinishPlayer2: number;
-}
+};
 
 export type Match = {
   number: number;
@@ -39,12 +39,15 @@ export type Competition = { [key: number]: Match };
 export type FirestoreRound = {
   players: string[];
   round: number;
+  type?: string;
+  paid?: number;
   status: "registering" | "running" | "completed";
+  fee?: number;
 };
 
 export type TPlayer = {
   name: string;
-}
+};
 
 export type TPlayersList = {
   [key: string]: TPlayer;
@@ -59,10 +62,17 @@ export type TRoundPlayer = {
   points?: number;
   basePoints?: number;
   bonus?: number;
-}
+};
 
 export type TRoundPlayerList = {
   [key: string]: TRoundPlayer;
+};
+
+export type TTeams = {
+  [key: string]: {
+    p1: string;
+    p2: string;
+  };
 };
 
 export type TResults = {
@@ -78,13 +88,13 @@ export type TResults = {
 export type AppUser = {
   loggedIn: boolean;
   user?: User;
-}
+};
 
 export type TRoundResult = {
   hf: number;
   one80s: number;
-  rank: number
-}
+  rank: number;
+};
 
 export type TRoundResults = {
   [key: string]: TRoundResult;
@@ -95,7 +105,7 @@ export type TStanding = {
   one80s?: number;
   points?: number;
   rank?: number;
-}
+};
 export type TStandings = {
   [key: string]: TStanding;
-}
+};

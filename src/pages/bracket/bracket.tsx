@@ -1,21 +1,19 @@
-import React, { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import "./bracket.scss";
 import { Bracket } from "../../components/bracket/bracket";
-import { getNextMatchOrder } from "../../core/competition";
 import {
-  AppUser,
   Competition,
   FirestoreRound,
   TPlayersList,
+  TTeams,
 } from "../../types";
-import { finished } from "stream";
-import { BLANK } from "../../core/constants";
 
 type TBracketPage = {
   competition: Competition;
   playersMap: TPlayersList;
   round: FirestoreRound;
   playerId: string;
+  teams: TTeams;
 };
 
 export const BracketPage = ({
@@ -23,6 +21,7 @@ export const BracketPage = ({
   playersMap,
   round,
   playerId,
+  teams
 }: TBracketPage): ReactElement => {
   return (
     <>
@@ -38,6 +37,8 @@ export const BracketPage = ({
             playerId={playerId}
             competition={competition}
             playersMap={playersMap}
+            teams={teams}
+            isPairs={round.type === 'teams'}
           />
         )}
       </div>

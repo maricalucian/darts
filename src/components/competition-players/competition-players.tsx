@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { FirestoreRound, TPlayersList, TRoundPlayerList } from "../../types";
 import { Box } from "@mui/material";
 import List from "@mui/material/List";
@@ -44,7 +44,14 @@ export const CompetitionPlayers = ({
   const [availabllePlayers, setAvailablePlayers] = useState([] as string[]);
 
   useEffect(() => {
-    setAvailablePlayers(getAvailablePlayersArray(playersMap, roundPlayers));
+    const availabllePlayers = getAvailablePlayersArray(
+      playersMap,
+      roundPlayers
+    );
+    availabllePlayers.sort((a, b) => {
+      return playersMap[a].name.localeCompare(playersMap[b].name);
+    });
+    setAvailablePlayers(availabllePlayers);
   }, [playersMap, roundPlayers]);
 
   return (
@@ -52,7 +59,15 @@ export const CompetitionPlayers = ({
       <Box sx={{ flexGrow: 1 }} padding={1}>
         <Grid container spacing={0}>
           <Grid xs={12} sm={5} className="players-list rotate-icons">
-            <div style={{ textAlign: "center", fontWeight: 'bold', padding: '12px 0 0' }}>Available players</div>
+            <div
+              style={{
+                textAlign: "center",
+                fontWeight: "bold",
+                padding: "12px 0 0",
+              }}
+            >
+              Available players
+            </div>
             <div className="list-container">
               <List>
                 {availabllePlayers.map((playerId) => {
@@ -93,31 +108,43 @@ export const CompetitionPlayers = ({
             <ForwardIcon fontSize="large" color="success" />
           </Grid>
           <Grid xs={12} sm={5} className="players-list">
-            <div style={{ textAlign: "center", fontWeight: 'bold', padding: '12px 0 0' }}>Selected players</div>
+            <div
+              style={{
+                textAlign: "center",
+                fontWeight: "bold",
+                padding: "12px 0 0",
+              }}
+            >
+              Selected players
+            </div>
             <div className="list-container">
               <List>
-                {Object.keys(roundPlayers).map((playerId) => {
-                  return (
-                    <ListItem
-                      key={playerId}
-                      secondaryAction={
-                        <IconButton
-                          edge="end"
-                          onClick={() => {
-                            removeRoundPlayer(round.round, playerId);
-                          }}
-                        >
-                          <RemoveCircleIcon />
-                        </IconButton>
-                      }
-                      disablePadding
-                    >
-                      <ListItemButton>
-                        <ListItemText primary={playersMap[playerId]?.name} />
-                      </ListItemButton>
-                    </ListItem>
-                  );
-                })}
+                {Object.keys(roundPlayers)
+                  .sort((a, b) =>
+                    playersMap[a].name.localeCompare(playersMap[b].name)
+                  )
+                  .map((playerId) => {
+                    return (
+                      <ListItem
+                        key={playerId}
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            onClick={() => {
+                              removeRoundPlayer(round.round, playerId);
+                            }}
+                          >
+                            <RemoveCircleIcon />
+                          </IconButton>
+                        }
+                        disablePadding
+                      >
+                        <ListItemButton>
+                          <ListItemText primary={playersMap[playerId]?.name} />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
               </List>
             </div>
           </Grid>

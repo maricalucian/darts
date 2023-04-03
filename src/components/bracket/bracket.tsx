@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { Match, Competition, TPlayersList } from "../../types";
+import { Match, Competition, TPlayersList, TTeams } from "../../types";
 
 import "./bracket.scss";
 import { getNextMatchOrder } from "../../core/competition";
@@ -13,6 +13,8 @@ type IBracketType = {
   competition: Competition;
   playersMap: TPlayersList;
   playerId: string;
+  teams: TTeams;
+  isPairs: boolean;
 };
 
 type ICoords = { x: number; y: number };
@@ -112,6 +114,29 @@ const drawMatchLine = (
   );
 };
 
+const getShortenedName = (name: string): string => {
+  const parts = name.split(' ');
+  return `${parts[1]} ${parts[0][0]}`;
+};
+
+const getPlayerName = (
+  playersMap: TPlayersList,
+  teams: TTeams,
+  playerId: string,
+  isPairs: boolean
+): string => {
+  if (playerId === BLANK) {
+    return BLANK;
+  }
+  if (isPairs) {
+    return `${getShortenedName(
+      playersMap[playerId]?.name
+    )} / ${getShortenedName(playersMap[teams[playerId]?.p2]?.name)}`;
+  }
+
+  return playersMap[playerId]?.name;
+};
+
 const drawMatch = (
   matchPositions: IMatchPositions,
   match: Match,
@@ -119,7 +144,8 @@ const drawMatch = (
   selected: string,
   setSelected: (s: string) => void,
   dimensions: any,
-  rightbracketHeight: number
+  teams: TTeams,
+  isPairs: boolean
 ) => {
   const { matchWidth, matchHeight, scoreBoxWidth } = dimensions;
   const hasBlanks = match.player1 === BLANK || match.player2 === BLANK;
@@ -180,7 +206,7 @@ const drawMatch = (
         }}
       />
 
-      {/* player background (and highlight color) */}
+      {/* top player background (and highlight color) */}
       <g
         onClick={() => {
           if (match.player1 !== BLANK) {
@@ -210,7 +236,7 @@ const drawMatch = (
               "winner"
             }`}
           >
-            {match.player1 === BLANK ? BLANK : playersMap[match.player1]?.name}
+            {getPlayerName(playersMap, teams, match.player1, isPairs)}
           </text>
         )}
         {!match.player1 && match.info1 && (
@@ -220,6 +246,7 @@ const drawMatch = (
         )}
       </g>
 
+      {/* bottom player background (and highlight color) */}
       <g
         onClick={() => {
           if (match.player2 !== BLANK) {
@@ -249,7 +276,7 @@ const drawMatch = (
               "winner"
             }`}
           >
-            {match.player2 === BLANK ? BLANK : playersMap[match.player2]?.name}
+            {getPlayerName(playersMap, teams, match.player2, isPairs)}
           </text>
         )}
         {!match.player2 && match.info2 && (
@@ -466,7 +493,9 @@ const drawBracket = (
   selected: string,
   setSelected: (s: string) => void,
   dimensions: any,
-  playerId: string
+  playerId: string,
+  teams: TTeams,
+  isPairs: boolean
 ) => {
   const matchPositions = calculateMatchPositions(
     competition,
@@ -474,11 +503,11 @@ const drawBracket = (
     dimensions
   );
 
-  const gameBracketHeight =
-    Math.pow(2, rounds - 1) *
-    (dimensions.matchHeight + dimensions.matchVerticalSpacing);
-  const rightbracketHeight =
-    2 * margin + gameBracketHeight - dimensions.matchVerticalSpacing;
+  // const gameBracketHeight =
+  //   Math.pow(2, rounds - 1) *
+  //   (dimensions.matchHeight + dimensions.matchVerticalSpacing);
+  // const rightbracketHeight =
+  //   2 * margin + gameBracketHeight - dimensions.matchVerticalSpacing;
 
   // populate aditional info an calculate last match for player
   Object.values(competition).forEach((match) => {
@@ -526,7 +555,8 @@ const drawBracket = (
           selected,
           setSelected,
           dimensions,
-          rightbracketHeight
+          teams,
+          isPairs
         );
       })}
     </>
@@ -537,6 +567,8 @@ export const Bracket = ({
   competition,
   playersMap,
   playerId,
+  teams,
+  isPairs,
 }: IBracketType): ReactElement => {
   const [selected, setSelected] = useState(playerId);
   const [scale, setScale] = useState(1);
@@ -586,7 +618,9 @@ export const Bracket = ({
                   setSelected(selected);
                 },
                 dimensions,
-                playerId
+                playerId,
+                teams,
+                isPairs
               )}
             </svg>
             <div className="action-button">

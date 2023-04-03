@@ -71,10 +71,9 @@
   border-radius: 8px;
   margin-bottom: 16px;
   padding: 8px;
-  margin-left: 8px;
-  margin-right: 8px;
   background-color: #e8e8e8;
   font-size: 14px;
+  align-items: center;
 
   &.next {
     cursor: pointer;
@@ -89,6 +88,8 @@
   .p2 {
     flex: 1 1 0px;
     padding: 8px;
+    display: flex;
+    align-items: center;
     // font-weight: bold;
   }
 
@@ -99,6 +100,12 @@
 
   .p1 {
     text-align: right;
+    justify-content: flex-end;
+  }
+
+  .p2 {
+    text-align: right;
+    justify-content: flex-start;
   }
 
   .match-no {

@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 import {
   addPlayer,
@@ -6,10 +6,16 @@ import {
   deleteAllRoundResults,
   setRoundStatus,
   startNewRound,
+  updateRoundInfo,
 } from "../../firestore/competition";
 
 import { CompetitionPlayers } from "../../components/competition-players/competition-players";
-import { FirestoreRound, TPlayersList, TRoundPlayerList } from "../../types";
+import {
+  FirestoreRound,
+  TPlayersList,
+  TRoundPlayerList,
+  TTeams,
+} from "../../types";
 import {
   Button,
   Dialog,
@@ -18,19 +24,14 @@ import {
   DialogContentText,
   TextField,
   DialogActions,
-  Box,
-  LinearProgress,
-  Typography,
-  ListItemText,
-  Card,
-  CardHeader,
-  List,
-  ListItem,
-  CardContent,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 import "./manage.scss";
 
-import { getPlayersStats, startRound } from "../../core/competition";
+import { startRound } from "../../core/competition";
+import { Teams } from "../../components/teams/teams";
+import { getPrizes } from "../home/home-running";
 
 const confirmStartRound = (round: FirestoreRound) => {
   if (
@@ -79,6 +80,7 @@ type TManagePage = {
   round: FirestoreRound;
   playersMap: TPlayersList;
   roundPlayers: TRoundPlayerList;
+  teams: TTeams;
   showLoader: (visible: boolean) => void;
 };
 
@@ -86,10 +88,13 @@ export const ManagePage = ({
   round,
   playersMap,
   roundPlayers,
+  teams,
   showLoader,
 }: TManagePage): ReactElement => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
+  const [fee, setFee] = useState(round.fee as any);
+  const [prizes, setPrizes] = useState([] as any);
   const closeModal = () => {
     setModalIsOpen(false);
   };
@@ -97,6 +102,10 @@ export const ManagePage = ({
   const handlePlayerNameChange = (event: any) => {
     setNewPlayerName(event.target.value);
   };
+
+  useEffect(() => {
+    setPrizes(getPrizes(Object.keys(roundPlayers).length, fee, round.paid));
+  }, [round, fee, roundPlayers]);
 
   return (
     <div className="manage">
@@ -135,6 +144,78 @@ export const ManagePage = ({
               <div className="def">Competition status:</div>
               <div className="val">{round.status || "none"}</div>
             </div>
+            <div className="info-line">
+              <div className="def">Entry fee:</div>
+              <div className="val">
+                <input
+                  type="number"
+                  value={fee}
+                  style={{
+                    width: "40px",
+                    fontWeight: "bold",
+                    height: "20px",
+                    lineHeight: "20px",
+                    fontSize: "16px",
+                    border: "1px solid #999",
+                    padding: "0 2px",
+                  }}
+                  onChange={(e: any) => {
+                    setFee(parseInt(e.target.value, 10));
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="success"
+                  style={{
+                    width: "86px",
+                    height: "20px",
+                    marginLeft: "4px",
+                  }}
+                  onClick={() => {
+                    updateRoundInfo(round, { fee: fee });
+                  }}
+                >
+                  Update
+                </Button>
+              </div>
+            </div>
+            <div className="info-line">
+              <div className="def">Prize pool:</div>
+              <div className="val">
+                {Object.keys(roundPlayers).length * fee} RON
+              </div>
+            </div>
+            <div className="info-line">
+              <div className="def">Places paid:</div>
+              <div className="val">
+                <ToggleButtonGroup
+                  value={round.paid}
+                  exclusive
+                  onChange={(e, v) => {
+                    updateRoundInfo(round, { paid: v });
+                  }}
+                  aria-label="text alignment"
+                >
+                  <ToggleButton value={0}>AUTO</ToggleButton>
+                  <ToggleButton value={1}>3</ToggleButton>
+                  <ToggleButton value={8}>4</ToggleButton>
+                  <ToggleButton value={13}>6</ToggleButton>
+                  <ToggleButton value={17}>8</ToggleButton>
+                </ToggleButtonGroup>
+              </div>
+            </div>
+            <div className="info-line">
+              <div>
+                {
+                  //@ts-ignore
+                  prizes.map((prize, i) => {
+                    return (
+                      <div key={i}>{`${prize.rank}. ${prize.prize}`} RON</div>
+                    );
+                  })
+                }
+              </div>
+            </div>
           </div>
 
           <div className="actions">
@@ -157,6 +238,27 @@ export const ManagePage = ({
                 }}
               >
                 Create new Round
+              </Button>
+            )}
+            {(round?.status === "completed" || !round?.status) && (
+              <Button
+                variant="contained"
+                color="success"
+                sx={{
+                  marginBottom: 1,
+                }}
+                onClick={() => {
+                  if (
+                    // eslint-disable-next-line no-restricted-globals
+                    confirm(`Are you sure you want start a new round?`)
+                  ) {
+                    startNewRound(true).then(() => {
+                      window.location.reload();
+                    });
+                  }
+                }}
+              >
+                New teams Round
               </Button>
             )}
             {round.status === "registering" && (
@@ -237,14 +339,29 @@ export const ManagePage = ({
       </div>
 
       {round.status === "registering" && (
-        <div className="box white">
-          <div className="box-label">Players</div>
-          <CompetitionPlayers
-            round={round}
-            playersMap={playersMap}
-            roundPlayers={roundPlayers}
-          />
-        </div>
+        <>
+          {round.type === "teams" && (
+            <div className="box white">
+              <div className="box-label">Teams</div>
+              <Teams
+                teams={teams}
+                round={round}
+                playersMap={playersMap}
+                roundPlayers={roundPlayers}
+              />
+            </div>
+          )}
+          {round.type !== "teams" && (
+            <div className="box white">
+              <div className="box-label">Players</div>
+              <CompetitionPlayers
+                round={round}
+                playersMap={playersMap}
+                roundPlayers={roundPlayers}
+              />
+            </div>
+          )}
+        </>
       )}
 
       <Dialog open={modalIsOpen} onClose={closeModal} fullWidth={true}>

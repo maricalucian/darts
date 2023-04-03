@@ -1,13 +1,21 @@
 import React, { ReactElement } from "react";
-import { Competition, FirestoreRound, Match, TPlayersList } from "../../types";
+import {
+  Competition,
+  FirestoreRound,
+  Match,
+  TPlayersList,
+  TTeams,
+} from "../../types";
 import { BLANK } from "../../core/constants";
 import "./matches.scss";
+import { getPlayerNameGame } from "../home/home-running";
 
 type TMatchesPageProps = {
   competition: Competition;
   playersMap: TPlayersList;
   round: FirestoreRound;
   popupMatchInfo: (round: number, match: Match) => void;
+  teams: TTeams;
 };
 
 // const hasBlanks = match.player1 === BLANK || match.player2 === BLANK;
@@ -16,6 +24,7 @@ export const MatchesPage = ({
   playersMap,
   round,
   popupMatchInfo,
+  teams,
 }: TMatchesPageProps): ReactElement => {
   const nextGames =
     round.status === "running"
@@ -58,11 +67,21 @@ export const MatchesPage = ({
                 >
                   <div className="match-no">{match.number}</div>
                   <div className="p1">
-                    {playersMap[match.player1 || ""].name}
+                    {getPlayerNameGame(
+                      round,
+                      playersMap,
+                      teams,
+                      match.player1 || ""
+                    )}
                   </div>
                   <div className="divider">vs</div>
                   <div className="p2">
-                    {playersMap[match.player2 || ""].name}
+                    {getPlayerNameGame(
+                      round,
+                      playersMap,
+                      teams,
+                      match.player2 || ""
+                    )}
                   </div>
                 </div>
               ))}
@@ -105,13 +124,21 @@ export const MatchesPage = ({
               >
                 <div className="match-no">{match.number}</div>
                 <div className="p1">
-                  {playersMap[match.player1 || ""].name} &nbsp;{" "}
-                  <b>{match.score1}</b>
+                  {getPlayerNameGame(
+                    round,
+                    playersMap,
+                    teams,
+                    match.player1 || ""
+                  )}{" "}
                 </div>
-                <div className="divider">-</div>
+                <div className="divider"><b>{match.score1}</b> - <b>{match.score2}</b></div>
                 <div className="p2">
-                  <b>{match.score2}</b> &nbsp;{" "}
-                  {playersMap[match.player2 || ""].name}
+                  {getPlayerNameGame(
+                    round,
+                    playersMap,
+                    teams,
+                    match.player2 || ""
+                  )}
                 </div>
               </div>
             ))}

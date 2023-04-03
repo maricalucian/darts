@@ -1,0 +1,16 @@
+.teams {
+  .list-title {
+    font-weight: bold;
+    padding-left: 16px;
+    margin-top: 8px;
+  }
+
+  .list-container {
+    max-height: 400px;
+    overflow-y: scroll;
+
+    li.selected {
+      background-color: #ffe8ab;
+    }
+  }
+}

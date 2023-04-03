@@ -1,25 +1,19 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import { ReactElement } from "react";
 import {
   Competition,
   TPlayersList,
   FirestoreRound,
   Match,
-  TRoundResults,
-  TRoundResult,
   TRoundPlayerList,
-  TRoundPlayer,
+  TTeams,
 } from "../../types";
 
-import { ListItemText, List, ListItem, ListItemIcon } from "@mui/material";
 
-import ListItemButton from "@mui/material/ListItemButton";
 import IconButton from "@mui/material/IconButton";
 import PaidIcon from "@mui/icons-material/Paid";
 
 import "./home.scss";
-import { prizeSturcture } from "../../core/competition";
 import { HomeRunning } from "./home-running";
-import { HomeRegistering } from "./home-registering";
 import { setPlayerPaid } from "../../firestore/competition";
 
 type THomePageProps = {
@@ -29,6 +23,22 @@ type THomePageProps = {
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
   funMode: boolean;
+  teams: TTeams;
+};
+
+export const getPlayerNameLong = (
+  round: FirestoreRound,
+  playersMap: TPlayersList,
+  teams: TTeams,
+  playerId: string
+): string => {
+  if (round.type === "teams") {
+    return `${playersMap[playerId].name} / ${
+      playersMap[teams[playerId].p2].name
+    }`;
+  }
+
+  return playersMap[playerId].name;
 };
 
 export const HomePage = ({
@@ -38,6 +48,7 @@ export const HomePage = ({
   popupMatchInfo,
   roundPlayers,
   funMode,
+  teams,
 }: THomePageProps): ReactElement => {
   return (
     <div className="home">
@@ -56,7 +67,8 @@ export const HomePage = ({
               {!funMode && `Round ${round.round} ${round.status}`}
             </div>
             <div className="total-players">
-              {Object.keys(roundPlayers).length} players
+              {Object.keys(roundPlayers).length}{" "}
+              {round.type === "teams" ? "teams" : "players"}
             </div>
           </div>
           {(round.status === "running" || round.status === "completed") && (
@@ -66,34 +78,33 @@ export const HomePage = ({
               playersMap={playersMap}
               popupMatchInfo={popupMatchInfo}
               round={round}
+              teams={teams}
               funMode
             />
           )}
-          {round.status === "registering" && (
-            <HomeRegistering
-              roundPlayers={roundPlayers}
-              competition={competition}
-              playersMap={playersMap}
-              popupMatchInfo={popupMatchInfo}
-              round={round}
-            />
-          )}
           <div className="box white">
-            <div className="box-label">Players</div>
+            <div className="box-label">
+              {round.type === "teams" ? "Teams" : "Players"}
+            </div>
             <div className="players">
               {Object.keys(roundPlayers)
                 .sort((a, b) => {
-                  if (
-                    (roundPlayers[a]?.rank || 0) > (roundPlayers[b]?.rank || 0)
-                  ) {
-                    return 1;
-                  } else if (
-                    (roundPlayers[a]?.rank || 0) < (roundPlayers[b]?.rank || 0)
-                  ) {
-                    return -1;
-                  } else {
-                    return 0;
+                  if (roundPlayers[a]?.rank || roundPlayers[b]?.rank) {
+                    if (
+                      (roundPlayers[a]?.rank || 0) >
+                      (roundPlayers[b]?.rank || 0)
+                    ) {
+                      return 1;
+                    } else if (
+                      (roundPlayers[a]?.rank || 0) <
+                      (roundPlayers[b]?.rank || 0)
+                    ) {
+                      return -1;
+                    } else {
+                      return 0;
+                    }
                   }
+                  return playersMap[a].name.localeCompare(playersMap[b].name);
                 })
                 .map((playerId) => {
                   return (
@@ -102,7 +113,7 @@ export const HomePage = ({
                         {roundPlayers[playerId]?.rank || "-"}
                       </div>
                       <div className="player-name">
-                        {playersMap[playerId].name}
+                        {getPlayerNameLong(round, playersMap, teams, playerId)}
                       </div>
                       <div className="player-points">
                         {roundPlayers[playerId]?.points && (

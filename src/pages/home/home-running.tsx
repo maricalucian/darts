@@ -5,11 +5,30 @@ import {
   FirestoreRound,
   Match,
   TRoundPlayerList,
+  TTeams,
 } from "../../types";
 import { BLANK } from "../../core/constants";
 
 import "./home.scss";
 import { prizeSturcture } from "../../core/competition";
+
+export const getPlayerNameGame = (
+  round: FirestoreRound,
+  playersMap: TPlayersList,
+  teams: TTeams,
+  playerId: string
+): ReactElement | string => {
+  if (round.type === "teams") {
+    return (
+      <div>
+        <div>{playersMap[playerId].name}</div>
+        <div>{playersMap[teams[playerId].p2].name}</div>
+      </div>
+    );
+  }
+
+  return playersMap[playerId].name;
+};
 
 type THomeRunningProps = {
   competition: Competition;
@@ -18,6 +37,39 @@ type THomeRunningProps = {
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
   funMode: boolean;
+  teams: TTeams;
+};
+
+export const getPrizes = (
+  totalPlayers: number,
+  fee: number,
+  places: number = 0
+) => {
+  let prizesMap = {};
+  if (places === 0) {
+    Object.keys(prizeSturcture).forEach((k) => {
+      if (parseInt(k) < totalPlayers) {
+        // @ts-ignore
+        prizesMap = prizeSturcture[k];
+      }
+    });
+  } else {
+    //@ts-ignore
+    prizesMap = prizeSturcture[places];
+  }
+
+  const total = totalPlayers * fee;
+
+  let prize: any = [];
+  Object.keys(prizesMap).forEach((k) => {
+    prize.push({
+      rank: k,
+      // @ts-ignore
+      prize: Math.round(total * (prizesMap[k] / 100)),
+    });
+  });
+
+  return prize;
 };
 
 export const HomeRunning = ({
@@ -27,14 +79,12 @@ export const HomeRunning = ({
   popupMatchInfo,
   roundPlayers,
   funMode,
+  teams,
 }: THomeRunningProps): ReactElement => {
   const [progress, setProgress] = useState(0);
   const [hf, setHf] = useState(0);
   const [one80s, setOne80s] = useState(0);
   const [totalOne80s, setTotalOne80s] = useState(0);
-  const [rankings, setRankings] = useState(
-    [] as { rank: number; name: string }[]
-  );
   const [prizes, setPrizes] = useState([] as { rank: number; prize: number }[]);
 
   useEffect(() => {
@@ -59,24 +109,25 @@ export const HomeRunning = ({
       return;
     }
     const players = Object.keys(roundPlayers).length;
-    let prizesMap = {};
-    Object.keys(prizeSturcture).forEach((k) => {
-      if (parseInt(k) < players) {
-        // @ts-ignore
-        prizesMap = prizeSturcture[k];
-      }
-    });
+    const prize = getPrizes(players, round?.fee || 10, round.paid);
+    // let prizesMap = {};
+    // Object.keys(prizeSturcture).forEach((k) => {
+    //   if (parseInt(k) < players) {
+    //     // @ts-ignore
+    //     prizesMap = prizeSturcture[k];
+    //   }
+    // });
 
-    const total = players * 10;
+    // const total = players * 10;
 
-    let prize: any = [];
-    Object.keys(prizesMap).forEach((k) => {
-      prize.push({
-        rank: k,
-        // @ts-ignore
-        prize: Math.round(total * (prizesMap[k] / 100)),
-      });
-    });
+    // let prize: any = [];
+    // Object.keys(prizesMap).forEach((k) => {
+    //   prize.push({
+    //     rank: k,
+    //     // @ts-ignore
+    //     prize: Math.round(total * (prizesMap[k] / 100)),
+    //   });
+    // });
 
     setPrizes(prize);
   }, [roundPlayers]);
@@ -122,7 +173,7 @@ export const HomeRunning = ({
         <>
           <div className="box">
             <div className="box-label">Next games</div>
-            <div className="matches">
+            <div className="home-matches">
               {nextGames.map((match) => (
                 <div
                   className="match-info next"
@@ -133,11 +184,21 @@ export const HomeRunning = ({
                 >
                   <div className="match-no">{match.number}</div>
                   <div className="p1">
-                    {playersMap[match.player1 || ""].name}
+                    {getPlayerNameGame(
+                      round,
+                      playersMap,
+                      teams,
+                      match.player1 || ""
+                    )}
                   </div>
                   <div className="divider">vs</div>
                   <div className="p2">
-                    {playersMap[match.player2 || ""].name}
+                    {getPlayerNameGame(
+                      round,
+                      playersMap,
+                      teams,
+                      match.player2 || ""
+                    )}
                   </div>
                 </div>
               ))}
@@ -154,11 +215,15 @@ export const HomeRunning = ({
           <div className="stats">
             <div className="info-line-big">
               <div className="val">{Object.keys(roundPlayers).length}</div>
-              <div className="def">players</div>
+              <div className="def">
+                {round.type === "teams" ? "teams" : "players"}
+              </div>
             </div>
             <div className="info-line-big">
               <div className="val">{one80s}</div>
-              <div className="def">180s by one player</div>
+              <div className="def">
+                180s by one {round.type === "teams" ? "team" : "player"}
+              </div>
             </div>
             <div className="info-line-big">
               <div className="val">{totalOne80s}</div>

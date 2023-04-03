@@ -1,9 +1,19 @@
-import { getRoundPlayers, startCompetition } from "../firestore/competition";
-import { Competition, FirestoreRound, Match, TResults, TRoundPlayerList } from "../types";
+import {
+  getRoundPlayers,
+  getRoundTeams,
+  startCompetition,
+} from "../firestore/competition";
+import {
+  Competition,
+  FirestoreRound,
+  Match,
+  TResults,
+  TRoundPlayerList,
+} from "../types";
 import { BLANK } from "./constants";
 
 export const prizeSturcture = {
-  0: {
+  1: {
     1: 50,
     2: 30,
     3: 20,
@@ -67,6 +77,15 @@ const getBlanksPositions = (
   return [Math.floor(Math.random() * (max - min + 1) + min)];
 };
 
+function shuffleArray(array: string[]) {
+  for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+  }
+}
+
 export const startRound = async (round: FirestoreRound) => {
   if (round.status !== "registering") {
     alert("Round cannot start at this time!");
@@ -75,6 +94,7 @@ export const startRound = async (round: FirestoreRound) => {
 
   const roundPlayers = await getRoundPlayers(round.round);
   const playersList = Object.keys(roundPlayers);
+  shuffleArray(playersList);
   const size = nextPowerOfTwo(playersList.length);
   const blanks = getBlanksPositions(size - playersList.length, 0, size - 1);
 
@@ -96,7 +116,6 @@ export const startRound = async (round: FirestoreRound) => {
   }
   // process byes
   competition = getProcessedCompetition(competition);
-
   startCompetition(round.round, competition);
 };
 
@@ -280,7 +299,9 @@ export const getProcessedCompetition = (
 };
 
 // TODO if swtich of changes listener, should read anc calculate competition results again here
-export const getPlayersStats = (roundPlayers: TRoundPlayerList): TRoundPlayerList => {
+export const getPlayersStats = (
+  roundPlayers: TRoundPlayerList
+): TRoundPlayerList => {
   // const results: any = {};
   // Object.values(competition).forEach((match) => {
   //   if (match.finished) {
