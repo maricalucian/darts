@@ -33,8 +33,8 @@ export const getPlayerNameLong = (
   playerId: string
 ): string => {
   if (round.type === "teams") {
-    return `${playersMap[playerId].name} / ${
-      playersMap[teams[playerId].p2].name
+    return `${playersMap[playerId]?.name} / ${
+      playersMap[teams[playerId]?.p2]?.name
     }`;
   }
 

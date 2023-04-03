@@ -70,50 +70,6 @@ export const Teams = ({
     <div className="teams">
       <Box
         sx={{ flexGrow: 1 }}
-        padding={1}
-        style={{
-          border: "1px solid #e9e9e9",
-          marginBottom: "12px",
-        }}
-      >
-        <div className="list-title">Teams</div>
-        <div className="list-container">
-          <List>
-            {Object.keys(teams)
-              .sort((a, b) =>
-                playersMap[teams[a].p1].name.localeCompare(playersMap[teams[b].p1].name)
-              )
-              .map((teamId) => {
-                return (
-                  <ListItem
-                    key={teams[teamId].p1}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        onClick={() => {
-                          disbandTeam(round.round, teamId);
-                        }}
-                      >
-                        <RemoveCircleIcon />
-                      </IconButton>
-                    }
-                    disablePadding
-                  >
-                    <ListItemButton>
-                      <ListItemText
-                        primary={`${i++}. ${playersMap[teams[teamId].p1].name} / ${
-                          playersMap[teams[teamId].p2].name
-                        }`}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-          </List>
-        </div>
-      </Box>
-      <Box
-        sx={{ flexGrow: 1 }}
         style={{ border: "1px solid #e9e9e9" }}
         padding={1}
       >
@@ -155,6 +111,52 @@ export const Teams = ({
                   >
                     <ListItemButton>
                       <ListItemText primary={playersMap[playerId]?.name} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
+          </List>
+        </div>
+      </Box>
+      <Box
+        sx={{ flexGrow: 1 }}
+        padding={1}
+        style={{
+          border: "1px solid #e9e9e9",
+          marginBottom: "12px",
+        }}
+      >
+        <div className="list-title">Teams</div>
+        <div className="list-container">
+          <List>
+            {Object.keys(teams)
+              .sort((a, b) =>
+                playersMap[teams[a].p1].name.localeCompare(
+                  playersMap[teams[b].p1].name
+                )
+              )
+              .map((teamId) => {
+                return (
+                  <ListItem
+                    key={teams[teamId].p1}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        onClick={() => {
+                          disbandTeam(round.round, teamId);
+                        }}
+                      >
+                        <RemoveCircleIcon />
+                      </IconButton>
+                    }
+                    disablePadding
+                  >
+                    <ListItemButton>
+                      <ListItemText
+                        primary={`${i++}. ${
+                          playersMap[teams[teamId].p1].name
+                        } / ${playersMap[teams[teamId].p2].name}`}
+                      />
                     </ListItemButton>
                   </ListItem>
                 );
