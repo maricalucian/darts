@@ -46,7 +46,8 @@ export const getPrizes = (
   places: number = 0
 ) => {
   let prizesMap = {};
-  if (places === 0) {
+  //@ts-ignore
+  if (!places || Object.keys(prizeSturcture[places] || {}) < 1) {
     Object.keys(prizeSturcture).forEach((k) => {
       if (parseInt(k) < totalPlayers) {
         // @ts-ignore

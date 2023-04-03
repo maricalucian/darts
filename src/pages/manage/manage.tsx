@@ -93,7 +93,7 @@ export const ManagePage = ({
 }: TManagePage): ReactElement => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [fee, setFee] = useState(round.fee as any);
+  const [fee, setFee] = useState((round.fee as any) || 10);
   const [prizes, setPrizes] = useState([] as any);
   const closeModal = () => {
     setModalIsOpen(false);
@@ -160,7 +160,7 @@ export const ManagePage = ({
                     padding: "0 2px",
                   }}
                   onChange={(e: any) => {
-                    setFee(parseInt(e.target.value, 10));
+                    setFee(parseInt(e.target.value, 10) || "");
                   }}
                 />
                 <Button
@@ -205,12 +205,14 @@ export const ManagePage = ({
               </div>
             </div>
             <div className="info-line">
-              <div>
+              <div className="prize-structure">
                 {
                   //@ts-ignore
                   prizes.map((prize, i) => {
                     return (
-                      <div key={i}>{`${prize.rank}. ${prize.prize}`} RON</div>
+                      <div key={i}>
+                        {prize.rank}. <b>{`${prize.prize}`} RON</b>
+                      </div>
                     );
                   })
                 }
