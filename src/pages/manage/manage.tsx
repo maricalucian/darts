@@ -134,92 +134,7 @@ export const ManagePage = ({
       </div>
       <div className="box white">
         <div className="box-label">Round</div>
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ flex: 1 }}>
-            <div className="info-line">
-              <div className="def">Competition players:</div>
-              <div className="val">{Object.keys(roundPlayers).length}</div>
-            </div>
-            <div className="info-line">
-              <div className="def">Competition status:</div>
-              <div className="val">{round.status || "none"}</div>
-            </div>
-            <div className="info-line">
-              <div className="def">Entry fee:</div>
-              <div className="val">
-                <input
-                  type="number"
-                  value={fee}
-                  style={{
-                    width: "40px",
-                    fontWeight: "bold",
-                    height: "20px",
-                    lineHeight: "20px",
-                    fontSize: "16px",
-                    border: "1px solid #999",
-                    padding: "0 2px",
-                  }}
-                  onChange={(e: any) => {
-                    setFee(parseInt(e.target.value, 10) || "");
-                  }}
-                />
-                <Button
-                  variant="contained"
-                  color="success"
-                  style={{
-                    width: "86px",
-                    height: "20px",
-                    marginLeft: "4px",
-                  }}
-                  onClick={() => {
-                    updateRoundInfo(round, { fee: fee });
-                  }}
-                >
-                  Update
-                </Button>
-              </div>
-            </div>
-            <div className="info-line">
-              <div className="def">Prize pool:</div>
-              <div className="val">
-                {Object.keys(roundPlayers).length * fee} RON
-              </div>
-            </div>
-            <div className="info-line">
-              <div className="def">Places paid:</div>
-              <div className="val">
-                <ToggleButtonGroup
-                  value={round.paid}
-                  exclusive
-                  onChange={(e, v) => {
-                    updateRoundInfo(round, { paid: v });
-                  }}
-                  aria-label="text alignment"
-                >
-                  <ToggleButton value={0}>AUTO</ToggleButton>
-                  <ToggleButton value={1}>3</ToggleButton>
-                  <ToggleButton value={8}>4</ToggleButton>
-                  <ToggleButton value={13}>6</ToggleButton>
-                  <ToggleButton value={17}>8</ToggleButton>
-                </ToggleButtonGroup>
-              </div>
-            </div>
-            <div className="info-line">
-              <div className="prize-structure">
-                {
-                  //@ts-ignore
-                  prizes.map((prize, i) => {
-                    return (
-                      <div key={i}>
-                        {prize.rank}. <b>{`${prize.prize}`} RON</b>
-                      </div>
-                    );
-                  })
-                }
-              </div>
-            </div>
-          </div>
-
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <div className="actions">
             {(round?.status === "completed" || !round?.status) && (
               <Button
@@ -312,6 +227,7 @@ export const ManagePage = ({
             )}
             {round.status === "running" && (
               <Button
+                variant="contained"
                 color="error"
                 sx={{
                   marginBottom: 1,
@@ -325,6 +241,7 @@ export const ManagePage = ({
             )}
             {round.status === "running" && (
               <Button
+                variant="contained"
                 color="error"
                 sx={{
                   marginBottom: 1,
@@ -336,6 +253,91 @@ export const ManagePage = ({
                 Reset
               </Button>
             )}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div className="info-line-manage">
+              <div className="def">Round players:</div>
+              <div className="val">{Object.keys(roundPlayers).length}</div>
+            </div>
+            <div className="info-line-manage">
+              <div className="def">Round status:</div>
+              <div className="val">{round.status || "none"}</div>
+            </div>
+            <div className="info-line-manage">
+              <div className="def">Entry fee:</div>
+              <div className="val">
+                <input
+                  type="number"
+                  value={fee}
+                  style={{
+                    width: "40px",
+                    fontWeight: "bold",
+                    height: "20px",
+                    lineHeight: "20px",
+                    fontSize: "16px",
+                    border: "1px solid #999",
+                    padding: "0 2px",
+                  }}
+                  onChange={(e: any) => {
+                    setFee(parseInt(e.target.value, 10) || "");
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="success"
+                  style={{
+                    width: "86px",
+                    height: "20px",
+                    marginLeft: "4px",
+                  }}
+                  onClick={() => {
+                    updateRoundInfo(round, { fee: fee });
+                  }}
+                >
+                  Update
+                </Button>
+              </div>
+            </div>
+            <div className="info-line-manage">
+              <div className="def">Prize pool:</div>
+              <div className="val">
+                {Object.keys(roundPlayers).length * fee} RON
+              </div>
+            </div>
+            <div className="info-line-manage">
+              <div
+                className="def"
+                style={{ display: "flex", flexDirection: "column" }}
+              >
+                Places paid:
+                <ToggleButtonGroup
+                  value={round.paid}
+                  exclusive
+                  onChange={(e, v) => {
+                    updateRoundInfo(round, { paid: v });
+                  }}
+                  aria-label="text alignment"
+                >
+                  <ToggleButton value={0}>AUTO</ToggleButton>
+                  <ToggleButton value={1}>3</ToggleButton>
+                  <ToggleButton value={8}>4</ToggleButton>
+                  <ToggleButton value={13}>6</ToggleButton>
+                  <ToggleButton value={17}>8</ToggleButton>
+                </ToggleButtonGroup>
+              </div>
+              <div className="val">
+                {
+                  //@ts-ignore
+                  prizes.map((prize, i) => {
+                    return (
+                      <div key={i}>
+                        {prize.rank}. <b>{`${prize.prize}`} RON</b>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+            </div>
           </div>
         </div>
       </div>

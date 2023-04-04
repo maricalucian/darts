@@ -12,11 +12,22 @@
   }
 
   .prize-structure {
+    margin-left: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     height: 57px;
     div {
       width: 80px;
+    }
+  }
+
+  .info-line-manage {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+
+    .val {
+      font-weight: bold;
     }
   }
 }
