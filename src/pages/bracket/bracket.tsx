@@ -1,12 +1,8 @@
 import { ReactElement } from "react";
 import "./bracket.scss";
 import { Bracket } from "../../components/bracket/bracket";
-import {
-  Competition,
-  FirestoreRound,
-  TPlayersList,
-  TTeams,
-} from "../../types";
+import { Competition, FirestoreRound, TPlayersList, TTeams } from "../../types";
+import { getCompetitionMatches } from "../../core/competition";
 
 type TBracketPage = {
   competition: Competition;
@@ -21,7 +17,7 @@ export const BracketPage = ({
   playersMap,
   round,
   playerId,
-  teams
+  teams,
 }: TBracketPage): ReactElement => {
   return (
     <>
@@ -38,7 +34,7 @@ export const BracketPage = ({
             competition={competition}
             playersMap={playersMap}
             teams={teams}
-            isPairs={round.type === 'teams'}
+            isPairs={round.type === "teams"}
           />
         )}
       </div>

@@ -79,10 +79,10 @@ const getBlanksPositions = (
 
 function shuffleArray(array: string[]) {
   for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
   }
 }
 
@@ -169,10 +169,21 @@ export const getRoundsMatches = (
 ): Competition => {
   // matched this round on right side
   for (let i = 0; i < roundMatches; i++) {
+    // let looserMatch = nextMatch + roundMatches * 3 - i - 1;
+    let looserMatch = nextMatch + roundMatches * 3 - i - 1;
+    if (nextMatch + i === 41) console.log(roundMatches);
+    if (round % 2 === 0 && roundMatches > 1) {
+      if (i < roundMatches / 2) {
+        looserMatch = nextMatch + roundMatches * 2 + roundMatches / 2 - i - 1;
+      } else {
+        looserMatch = nextMatch + roundMatches * 3 - (i - roundMatches / 2) - 1;
+      }
+    }
+
     matches[nextMatch + i] = {
       number: nextMatch + i,
       winnerMatch: nextMatch + roundMatches * 3 + Math.floor(i / 2),
-      looserMatch: nextMatch + roundMatches * 3 - i - 1,
+      looserMatch: looserMatch,
       winnerPosition: 0,
       looserPosition: 0,
       round: round,
