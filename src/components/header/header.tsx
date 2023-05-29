@@ -204,6 +204,18 @@ export const Header = ({ round, user, funMode }: HeaderProps): ReactElement => {
               >
                 <TournamentSvg style={{ height: "28px", marginTop: "0px" }} />
               </Button>
+              {!funMode && (
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to={"/standings"}
+                  className={`${
+                    location.pathname === "/standings" && "selected"
+                  }`}
+                >
+                  <CupSvg style={{ height: "28px", marginLeft: "-2px" }} />
+                </Button>
+              )}
             </div>
 
             <b>

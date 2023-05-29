@@ -76,7 +76,21 @@ export const getCurrentRound = async (): Promise<FirestoreRound> => {
   );
   return getDoc(roundRef).then((docSnap) => {
     if (!docSnap.exists()) {
-      throw new Error("Round already exists");
+      throw new Error("Round not found");
+    }
+    return docSnap.data() as FirestoreRound;
+  });
+};
+
+export const getRoundAndPlayers = async (roundIndex: number): Promise<any> => {
+  return Promise.all([getRound(roundIndex), getRoundPlayers(roundIndex)]);
+};
+
+export const getRound = async (roundIndex: number): Promise<FirestoreRound> => {
+  const roundRef = doc(db, `competitions/${tournament}/rounds/${roundIndex}`);
+  return getDoc(roundRef).then((docSnap) => {
+    if (!docSnap.exists()) {
+      throw new Error("Round not found");
     }
     return docSnap.data() as FirestoreRound;
   });

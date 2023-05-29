@@ -61,6 +61,7 @@ export const StandingsPage = ({
 }: TStandingsPageProps): ReactElement => {
   const [records, setRecords] = useState({} as any);
   const [standings, setStandings] = useState([] as any);
+  const [entries, setEntries] = useState(0);
 
   useEffect(() => {
     if (Object.keys(playersMap).length < 1) {
@@ -68,6 +69,7 @@ export const StandingsPage = ({
     }
     getCompetition("duminica23").then((data) => {
       setRecords(data.records || {});
+      setEntries(data.totalEntries || 0);
     });
     getStandings().then((data: TStandings) => {
       setStandings(
@@ -96,7 +98,7 @@ export const StandingsPage = ({
             <div className="def">
               180's by{" "}
               {(records.one80sPlayers || []).map((player: any) => {
-                return playersMap?.[player.player]?.name;
+                return playersMap?.[player.player]?.name + ' ';
               })}
             </div>
           </div>
@@ -112,8 +114,8 @@ export const StandingsPage = ({
             </div>
           </div>
           <div className="info-line-big">
-            <div className="val">70</div>
-            <div className="def">masters pool</div>
+            <div className="val">{entries * 5}</div>
+            <div className="def">RON masters pool</div>
           </div>
         </div>
       </div>

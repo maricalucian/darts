@@ -173,6 +173,8 @@ function App() {
                   popupMatchInfo={showMatchInfo}
                   round={round}
                   funMode={funMode}
+                  user={user}
+                  currendRoundIndex={currendRoundIndex}
                 />
               }
             />

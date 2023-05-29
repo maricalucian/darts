@@ -1,4 +1,10 @@
-import { ReactElement } from "react";
+import {
+  JSXElementConstructor,
+  ReactElement,
+  ReactFragment,
+  useEffect,
+  useState,
+} from "react";
 import {
   Competition,
   TPlayersList,
@@ -6,15 +12,22 @@ import {
   Match,
   TRoundPlayerList,
   TTeams,
+  AppUser,
 } from "../../types";
-
 
 import IconButton from "@mui/material/IconButton";
 import PaidIcon from "@mui/icons-material/Paid";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 import "./home.scss";
 import { HomeRunning } from "./home-running";
-import { setPlayerPaid } from "../../firestore/competition";
+import {
+  getRound,
+  getRoundAndPlayers,
+  setPlayerPaid,
+} from "../../firestore/competition";
+import { ADM, API_ENDPOINT } from "../../core/constants";
+import { Button, MenuItem, Select } from "@mui/material";
 
 type THomePageProps = {
   competition: Competition;
@@ -24,6 +37,8 @@ type THomePageProps = {
   popupMatchInfo: (round: number, match: Match) => void;
   funMode: boolean;
   teams: TTeams;
+  user: AppUser;
+  currendRoundIndex: number;
 };
 
 export const getPlayerNameLong = (
@@ -49,55 +64,199 @@ export const HomePage = ({
   roundPlayers,
   funMode,
   teams,
+  user,
+  currendRoundIndex,
 }: THomePageProps): ReactElement => {
+  const [displayRound, setDisplayRound] = useState(round);
+  const [displayPlayers, setDisplayPlayers] = useState(roundPlayers);
+  const [selectOptions, setSelectOptions] = useState([] as any);
+
+  useEffect(() => {
+    const selectOptions = [];
+    for (let i = 1; i <= currendRoundIndex; i++) {
+      selectOptions.push(i);
+    }
+    setSelectOptions(selectOptions);
+  }, [currendRoundIndex]);
+
+  useEffect(() => {
+    if (
+      !displayRound.round ||
+      //@ts-ignore
+      currendRoundIndex === parseInt(displayRound.round, 10)
+    ) {
+      setDisplayRound(round);
+    }
+  }, [currendRoundIndex, displayRound.round, round]);
+
+  useEffect(() => {
+    if (
+      !displayRound.round ||
+      //@ts-ignore
+      currendRoundIndex === parseInt(displayRound.round, 10)
+    ) {
+      setDisplayPlayers(roundPlayers);
+    }
+  }, [currendRoundIndex, displayRound.round, round.round, roundPlayers]);
+
+  const selectRound = (round: any) => {
+    if (round === currendRoundIndex) {
+      setDisplayRound(round);
+      setDisplayPlayers(roundPlayers);
+    } else {
+      getRoundAndPlayers(round).then((data) => {
+        setDisplayRound(data[0]);
+        setDisplayPlayers(data[1]);
+      });
+    }
+  };
+
   return (
     <div className="home">
-      {!round?.round && (
+      {!displayRound?.round && (
         <div
           style={{ marginTop: "32px", textAlign: "center", fontWeight: "bold" }}
         >
           No game currently running
         </div>
       )}
-      {round?.round && (
+      {displayRound?.round && (
         <>
           <div className="top">
-            <div className={`status ${round.status}`}>
-              {funMode && `Friendly game ${round.status}`}
-              {!funMode && `Round ${round.round} ${round.status}`}
+            <div style={{ display: "flex" }}>
+              {funMode && (
+                <div className={`status ${displayRound.status}`}>
+                  Friendly game {displayRound.status}
+                </div>
+              )}
+              {!funMode && (
+                <>
+                  <Select
+                    id="demo-simple-select"
+                    value={displayRound.round || ""}
+                    variant="outlined"
+                    // defaultValue=""
+                    onChange={(e) => {
+                      selectRound(e.target.value);
+                    }}
+                    sx={{
+                      backgroundColor: "#1976d2",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      height: "36px",
+                      borderRadius: "8px",
+                      //@ts-ignore
+                      "& .MuiSvgIcon-root": {
+                        fill: "#fff",
+                      },
+                    }}
+                  >
+                    {selectOptions.map((option: any) => {
+                      return (
+                        <MenuItem key={option} value={option}>
+                          ROUND {option}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                  <div
+                    className={`status ${displayRound.status}`}
+                    style={{ marginLeft: "4px" }}
+                  >
+                    {displayRound.status}
+                  </div>
+                </>
+              )}
             </div>
+            {/* <div style={{ display: "flex" }}>
+              <div className={`status ${displayRound.status}`}>
+                {funMode && `Friendly game ${displayRound.status}`}
+                {!funMode &&
+                  `Round ${displayRound.round} ${displayRound.status}`}
+              </div>
+              {!funMode && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    style={{
+                      borderRadius: "8px",
+                      marginLeft: "4px",
+                      // marginBottom: "2px",
+                    }}
+                  >
+                    <ArrowDropDownIcon />
+                  </Button>
+                </div>
+              )}
+            </div> */}
             <div className="total-players">
               {Object.keys(roundPlayers).length}{" "}
-              {round.type === "teams" ? "teams" : "players"}
+              {displayRound.type === "teams" ? "teams" : "players"}
             </div>
           </div>
-          {(round.status === "running" || round.status === "completed") && (
+          {user.user?.uid === ADM && displayRound.status === "completed" && (
+            <div style={{ display: "flex", justifyContent: "flex-start" }}>
+              <Button
+                variant="contained"
+                color="success"
+                style={{
+                  width: "146px",
+                  height: "26px",
+                  marginLeft: "4px",
+                  marginBottom: "8px",
+                }}
+                onClick={() => {
+                  user.user &&
+                    user.user
+                      .getIdToken()
+                      .then(function (idToken) {
+                        fetch(
+                          `${API_ENDPOINT}/manualProcess?round=${displayRound.round}`,
+                          {
+                            headers: {
+                              Authorization: `Token ${idToken}`,
+                            },
+                          }
+                        );
+                      })
+                      .catch(function (error) {
+                        console.log("error");
+                      });
+                }}
+              >
+                Crunch again
+              </Button>
+            </div>
+          )}
+          {(displayRound.status === "running" ||
+            displayRound.status === "completed") && (
             <HomeRunning
-              roundPlayers={roundPlayers}
+              roundPlayers={displayPlayers}
               competition={competition}
               playersMap={playersMap}
               popupMatchInfo={popupMatchInfo}
-              round={round}
+              round={displayRound}
               teams={teams}
               funMode
             />
           )}
           <div className="box white">
             <div className="box-label">
-              {round.type === "teams" ? "Teams" : "Players"}
+              {displayRound.type === "teams" ? "Teams" : "Players"}
             </div>
             <div className="players">
-              {Object.keys(roundPlayers)
+              {Object.keys(displayPlayers)
                 .sort((a, b) => {
-                  if (roundPlayers[a]?.rank || roundPlayers[b]?.rank) {
+                  if (displayPlayers[a]?.rank || displayPlayers[b]?.rank) {
                     if (
-                      (roundPlayers[a]?.rank || 0) >
-                      (roundPlayers[b]?.rank || 0)
+                      (displayPlayers[a]?.rank || 0) >
+                      (displayPlayers[b]?.rank || 0)
                     ) {
                       return 1;
                     } else if (
-                      (roundPlayers[a]?.rank || 0) <
-                      (roundPlayers[b]?.rank || 0)
+                      (displayPlayers[a]?.rank || 0) <
+                      (displayPlayers[b]?.rank || 0)
                     ) {
                       return -1;
                     } else {
@@ -110,19 +269,24 @@ export const HomePage = ({
                   return (
                     <div key={playerId} className="player-row">
                       <div className="rank">
-                        {roundPlayers[playerId]?.rank || "-"}
+                        {displayPlayers[playerId]?.rank || "-"}
                       </div>
                       <div className="player-name">
-                        {getPlayerNameLong(round, playersMap, teams, playerId)}
+                        {getPlayerNameLong(
+                          displayRound,
+                          playersMap,
+                          teams,
+                          playerId
+                        )}
                       </div>
                       <div className="player-points">
-                        {roundPlayers[playerId]?.points && (
+                        {displayPlayers[playerId]?.points && (
                           <>
-                            <b> {roundPlayers[playerId]?.points}p </b>
+                            <b> {displayPlayers[playerId]?.points}p </b>
                             <span className="points-info">
                               {"("}
-                              {roundPlayers[playerId]?.basePoints} +{" "}
-                              {roundPlayers[playerId]?.bonus}%{")"}
+                              {displayPlayers[playerId]?.basePoints} +{" "}
+                              {displayPlayers[playerId]?.bonus}%{")"}
                             </span>
                           </>
                         )}
@@ -134,21 +298,21 @@ export const HomePage = ({
                             // eslint-disable-next-line no-restricted-globals
                             confirm(
                               `Set ${playersMap[playerId].name} to ${
-                                roundPlayers[playerId].paid ? "NOT" : ""
+                                displayPlayers[playerId].paid ? "NOT" : ""
                               } PAID?`
                             )
                           ) {
                             setPlayerPaid(
-                              round.round,
+                              displayRound.round,
                               playerId,
-                              !roundPlayers[playerId].paid
+                              !displayPlayers[playerId].paid
                             );
                           }
                         }}
                       >
                         <PaidIcon
                           style={{
-                            fill: roundPlayers[playerId].paid
+                            fill: displayPlayers[playerId].paid
                               ? "#ff9f1e"
                               : "#ccc",
                           }}
