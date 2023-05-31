@@ -121,6 +121,12 @@ export const MatchInfoDialog = ({
     setResults({ ...results, ...{ [res]: val.toString() } });
   };
 
+  const canEdit =
+    round.status !== "completed" &&
+    (usersMap[uid] === match.player1 ||
+      usersMap[uid] === match.player2 ||
+      uid === ADM);
+
   return (
     <Dialog
       open={dialogIsOpen}
@@ -265,20 +271,17 @@ export const MatchInfoDialog = ({
             >
               Close
             </Button>
-            {!dialogEditMode &&
-              (usersMap[uid] === match.player1 ||
-                usersMap[uid] === match.player2 ||
-                uid === ADM) && (
-                <Button
-                  variant="contained"
-                  color="info"
-                  onClick={() => {
-                    setDialogEditMode(true);
-                  }}
-                >
-                  Update Score
-                </Button>
-              )}
+            {!dialogEditMode && canEdit && (
+              <Button
+                variant="contained"
+                color="info"
+                onClick={() => {
+                  setDialogEditMode(true);
+                }}
+              >
+                Update Score
+              </Button>
+            )}
             {dialogEditMode && (
               <Button
                 variant="contained"

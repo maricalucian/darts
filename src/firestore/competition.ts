@@ -60,9 +60,13 @@ export const startNewRound = async (teams: boolean = false) => {
       type: teams ? "teams" : "",
       status: "registering",
     });
-    await setDoc(doc(db, "competitions", tournament), {
-      currentRound: newRound,
-    });
+    await setDoc(
+      doc(db, "competitions", tournament),
+      {
+        currentRound: newRound,
+      },
+      { merge: true }
+    );
   } catch (e) {
     console.error(e);
   }

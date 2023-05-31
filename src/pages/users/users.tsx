@@ -154,7 +154,7 @@ export const UsersPage = ({
                         setSelectedPlayer(playerId);
                       }}
                     >
-                      <ListItemText primary={playersMap[playerId].name} />
+                      <ListItemText primary={`${playersMap[playerId].name}`} />
                     </ListItemButton>
                   </ListItem>
                 );
