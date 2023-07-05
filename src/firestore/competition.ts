@@ -444,3 +444,16 @@ export const getStandings = async () => {
 
   return standings;
 };
+
+export const getStandingsAfterRound = async (roundIndex: number) => {
+  const standings: TStandings = {};
+  const querySnapshot = await getDocs(
+    collection(db, `competitions/duminica23/rounds/${roundIndex}/standings`)
+  );
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    standings[doc.id] = doc.data() as TStanding;
+  });
+
+  return standings;
+};

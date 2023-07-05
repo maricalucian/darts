@@ -8,10 +8,22 @@ import {
   TStandings,
 } from "../../types";
 import "./standings.scss";
-import { getCompetition, getStandings } from "../../firestore/competition";
+import {
+  getCompetition,
+  getStandings,
+  getStandingsAfterRound,
+} from "../../firestore/competition";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
-import { ListItemText, Card, List, ListItem, CardContent } from "@mui/material";
+import {
+  ListItemText,
+  Card,
+  List,
+  ListItem,
+  CardContent,
+  MenuItem,
+  Select,
+} from "@mui/material";
 
 type TStandingsPageProps = {
   competition: Competition;
@@ -19,6 +31,7 @@ type TStandingsPageProps = {
   round: FirestoreRound;
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
+  currendRoundIndex: number;
 };
 
 const bonusStructure = {
@@ -58,10 +71,21 @@ export const StandingsPage = ({
   playersMap,
   popupMatchInfo,
   roundPlayers,
+  currendRoundIndex,
 }: TStandingsPageProps): ReactElement => {
   const [records, setRecords] = useState({} as any);
   const [standings, setStandings] = useState([] as any);
   const [entries, setEntries] = useState(0);
+  const [selectOptions, setSelectOptions] = useState([] as any);
+  const [selectedRound, setSelectedRound] = useState(currendRoundIndex);
+
+  useEffect(() => {
+    const selectOptions = [];
+    for (let i = 1; i <= currendRoundIndex; i++) {
+      selectOptions.push(i);
+    }
+    setSelectOptions(selectOptions);
+  }, [currendRoundIndex]);
 
   useEffect(() => {
     if (Object.keys(playersMap).length < 1) {
@@ -88,17 +112,38 @@ export const StandingsPage = ({
     });
   }, [playersMap]);
 
+  const selectRound = (round: any) => {
+    setSelectedRound(round);
+    getStandingsAfterRound(round).then((data: TStandings) => {
+      setStandings(
+        Object.keys(data).map((playerId) => {
+          return {
+            id: playerId,
+            name: playersMap[playerId].name,
+            points: data[playerId].points,
+            one80s: data[playerId].one80s,
+            hf: data[playerId].hf,
+            rank: data[playerId].rank,
+            bonus: `${getBonusForRank(data[playerId].rank || 99)}%`,
+          };
+        })
+      );
+    });
+  };
+
   return (
     <div className="standings">
       <div className="box">
-        <div className="box-label">Tournament info</div>
+        <div className="box-label">
+          <div>Tournament info</div>
+        </div>
         <div className="stats">
           <div className="info-line-big">
             <div className="val">{records?.one80s}</div>
             <div className="def">
               180's by{" "}
               {(records.one80sPlayers || []).map((player: any) => {
-                return playersMap?.[player.player]?.name + ' ';
+                return playersMap?.[player.player]?.name + " ";
               })}
             </div>
           </div>
@@ -120,7 +165,40 @@ export const StandingsPage = ({
         </div>
       </div>
       <div className="box white">
-        <div className="box-label">Standings</div>
+        <div className="box-label">
+          <div>Standings</div>
+          <div className="round-select">
+            <Select
+              id="demo-simple-select"
+              value={selectedRound}
+              variant="outlined"
+              // defaultValue=""
+              onChange={(e) => {
+                selectRound(e.target.value);
+              }}
+              sx={{
+                // backgroundColor: "#1976d2",
+                // color: "#fff",
+                // fontWeight: "bold",
+                height: "28px",
+                borderRadius: "8px",
+                outline: 'none',
+                //@ts-ignore
+                // "& .MuiSvgIcon-root": {
+                //   fill: "#fff",
+                // },
+              }}
+            >
+              {selectOptions.map((option: any) => {
+                return (
+                  <MenuItem key={option} value={option}>
+                    AFTER ROUND {option}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </div>
+        </div>
         <div className="players">
           <table>
             <tbody>

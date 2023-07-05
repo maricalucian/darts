@@ -237,6 +237,7 @@ function App() {
                   playersMap={playersMap}
                   popupMatchInfo={showMatchInfo}
                   round={round}
+                  currendRoundIndex={currendRoundIndex}
                 />
               }
             />
