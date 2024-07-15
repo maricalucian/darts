@@ -74,7 +74,11 @@ const getBlanksPositions = (
     );
   }
 
-  return [Math.floor(Math.random() * (max - min + 1) + min)];
+  if (requiredBlanks > 0) {
+    return [Math.floor(Math.random() * (max - min + 1) + min)];
+  }
+
+  return [];
 };
 
 function shuffleArray(array: string[]) {

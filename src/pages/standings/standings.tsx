@@ -32,6 +32,7 @@ type TStandingsPageProps = {
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
   currendRoundIndex: number;
+  compId: string;
 };
 
 const bonusStructure = {
@@ -72,6 +73,7 @@ export const StandingsPage = ({
   popupMatchInfo,
   roundPlayers,
   currendRoundIndex,
+  compId
 }: TStandingsPageProps): ReactElement => {
   const [records, setRecords] = useState({} as any);
   const [standings, setStandings] = useState([] as any);
@@ -91,11 +93,11 @@ export const StandingsPage = ({
     if (Object.keys(playersMap).length < 1) {
       return;
     }
-    getCompetition("duminica23").then((data) => {
+    getCompetition(compId).then((data) => {
       setRecords(data.records || {});
       setEntries(data.totalEntries || 0);
     });
-    getStandings().then((data: TStandings) => {
+    getStandings(compId).then((data: TStandings) => {
       setStandings(
         Object.keys(data).map((playerId) => {
           return {
@@ -110,11 +112,11 @@ export const StandingsPage = ({
         })
       );
     });
-  }, [playersMap]);
+  }, [playersMap, compId]);
 
   const selectRound = (round: any) => {
     setSelectedRound(round);
-    getStandingsAfterRound(round).then((data: TStandings) => {
+    getStandingsAfterRound(compId, round).then((data: TStandings) => {
       setStandings(
         Object.keys(data).map((playerId) => {
           return {

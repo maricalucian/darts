@@ -57,7 +57,7 @@ const emptyRound: FirestoreRound = {
 };
 
 const localComp = localStorage.getItem("competition");
-const funMode = localComp === "friendly";
+const compId = localComp || "funday24";
 
 function App() {
   const [round, setRound] = useState({} as FirestoreRound);
@@ -160,7 +160,7 @@ function App() {
       {preloading && <Preloader />}
       {!preloading && (
         <div className="app">
-          <Header round={round} user={user} funMode={funMode} />
+          <Header round={round} user={user} compId={compId} />
           <Routes>
             <Route
               path="/"
@@ -172,7 +172,7 @@ function App() {
                   playersMap={playersMap}
                   popupMatchInfo={showMatchInfo}
                   round={round}
-                  funMode={funMode}
+                  compId={compId}
                   user={user}
                   currendRoundIndex={currendRoundIndex}
                 />
@@ -237,6 +237,7 @@ function App() {
                   playersMap={playersMap}
                   popupMatchInfo={showMatchInfo}
                   round={round}
+                  compId={compId}
                   currendRoundIndex={currendRoundIndex}
                 />
               }

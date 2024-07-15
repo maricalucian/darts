@@ -11,6 +11,7 @@ import { BLANK } from "../../core/constants";
 
 import "./home.scss";
 import { prizeSturcture } from "../../core/competition";
+import { funMode } from "../../core/utils";
 
 export const getPlayerNameGame = (
   round: FirestoreRound,
@@ -36,7 +37,7 @@ type THomeRunningProps = {
   round: FirestoreRound;
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
-  funMode: boolean;
+  compId: string;
   teams: TTeams;
 };
 
@@ -79,11 +80,12 @@ export const HomeRunning = ({
   playersMap,
   popupMatchInfo,
   roundPlayers,
-  funMode,
+  compId,
   teams,
 }: THomeRunningProps): ReactElement => {
   const [progress, setProgress] = useState(0);
   const [hf, setHf] = useState(0);
+  const [hfPlayer, setHfPlayer] = useState("");
   const [one80s, setOne80s] = useState(0);
   const [totalOne80s, setTotalOne80s] = useState(0);
   const [prizes, setPrizes] = useState([] as { rank: number; prize: number }[]);
@@ -139,11 +141,19 @@ export const HomeRunning = ({
       Object.keys(playersMap || []).length > 0
     ) {
       let hf = 0;
+      let hfPlayer = "";
       let one80s = 0;
       let total180 = 0;
-      Object.values(roundPlayers).forEach((player) => {
-        if (player?.hf && player?.hf > hf) {
-          hf = player.hf;
+      Object.keys(roundPlayers).forEach((uid) => {
+        const player = roundPlayers[uid];
+        if (player?.hf && player?.hf >= hf && player?.hf > 1) {
+          if(player?.hf == hf) {
+            hf = player.hf;
+            hfPlayer = hfPlayer + ' ' + playersMap[uid].name;
+          } else {
+            hf = player.hf;
+            hfPlayer = playersMap[uid].name;
+          }
         }
         if (player?.one80s && player?.one80s > one80s) {
           one80s = player.one80s;
@@ -152,6 +162,7 @@ export const HomeRunning = ({
         total180 += player.one80s || 0;
       });
       setHf(hf);
+      setHfPlayer(hfPlayer);
       setOne80s(one80s);
       setTotalOne80s(total180);
     }
@@ -209,8 +220,8 @@ export const HomeRunning = ({
       )}
       <div className="box">
         <div className="box-label">
-          {funMode && `Game info`}
-          {!funMode && `Round ${round.round} info`}
+          {funMode(compId) && `Game info`}
+          {!funMode(compId) && `Round ${round.round} info`}
         </div>
         <div className="box-content competition-info">
           <div className="stats">
@@ -233,6 +244,10 @@ export const HomeRunning = ({
             <div className="info-line-big">
               <div className="val">{hf}</div>
               <div className="def">high out</div>
+            </div>
+            <div className="info-line-big">
+              <div style={{width: '32px'}}></div>
+              <div className="def">{hfPlayer}</div>
             </div>
             <div style={{ textAlign: "center" }}>
               <div className="progress">

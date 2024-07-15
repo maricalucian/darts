@@ -58,7 +58,15 @@ export const UsersPage = ({
   const [unusedPlayer, setUnusedPlayer] = useState([] as string[]);
 
   useEffect(() => {
-    setUnusedPlayer(getUnusedPlayers(playersMap, usersMap));
+    const uuPlayers = getUnusedPlayers(playersMap, usersMap);
+    uuPlayers.sort((a: string, b: string) => {
+      if (playersMap[a].name < playersMap[b].name) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    setUnusedPlayer(uuPlayers);
   }, [playersMap, users]);
 
   useEffect(() => {
@@ -129,15 +137,15 @@ export const UsersPage = ({
                 key={999}
                 disablePadding
                 className={`${
-                  selectedPlayer === 'XXNONE' && "selected-list-item"
+                  selectedPlayer === "XXNONE" && "selected-list-item"
                 }`}
               >
                 <ListItemButton
                   onClick={() => {
-                    setSelectedPlayer('XXNONE');
+                    setSelectedPlayer("XXNONE");
                   }}
                 >
-                  <ListItemText primary={'Not Specified'} />
+                  <ListItemText primary={"Not Specified"} />
                 </ListItemButton>
               </ListItem>
               {unusedPlayer.map((playerId) => {

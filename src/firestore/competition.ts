@@ -29,7 +29,9 @@ import {
 } from "../types";
 
 const localComp = localStorage.getItem("competition");
-const tournament = localComp === "friendly" ? "friendly" : "duminica23";
+const tournament = localComp || 'funday23';
+
+console.log(tournament);
 
 export const startNewRound = async (teams: boolean = false) => {
   const currentRound = await getCurrentRoundIndex();
@@ -432,10 +434,10 @@ export const setPlayerPaid = (
   );
 };
 
-export const getStandings = async () => {
+export const getStandings = async (compId: string) => {
   const standings: TStandings = {};
   const querySnapshot = await getDocs(
-    collection(db, `competitions/duminica23/standings`)
+    collection(db, `competitions/${compId}/standings`)
   );
   querySnapshot.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
@@ -445,10 +447,10 @@ export const getStandings = async () => {
   return standings;
 };
 
-export const getStandingsAfterRound = async (roundIndex: number) => {
+export const getStandingsAfterRound = async (compId: string, roundIndex: number) => {
   const standings: TStandings = {};
   const querySnapshot = await getDocs(
-    collection(db, `competitions/duminica23/rounds/${roundIndex}/standings`)
+    collection(db, `competitions/${compId}/rounds/${roundIndex}/standings`)
   );
   querySnapshot.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots

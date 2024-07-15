@@ -31,6 +31,12 @@ type TResultsString = {
   player2180s: string;
   player1HF: string;
   player2HF: string;
+  player1avg: string;
+  player2avg: string;
+  player1140s: string;
+  player2140s: string;
+  player1100s: string;
+  player2100s: string;
 };
 
 const getShortenedName = (name: string): string => {
@@ -74,6 +80,12 @@ export const MatchInfoDialog = ({
     player2180s: "",
     player1HF: "",
     player2HF: "",
+    player1avg: "",
+    player2avg: "",
+    player1140s: "",
+    player2140s: "",
+    player1100s: "",
+    player2100s: "",
   } as TResultsString);
 
   useEffect(() => {
@@ -83,6 +95,12 @@ export const MatchInfoDialog = ({
     results.player2180s = match.player2180s?.toString() || "";
     results.player1HF = match.player1HF?.toString() || "";
     results.player2HF = match.player2HF?.toString() || "";
+    results.player1avg = match.player1avg?.toString() || "";
+    results.player2avg = match.player2avg?.toString() || "";
+    results.player1140s = match.player1140s?.toString() || "";
+    results.player2140s = match.player2140s?.toString() || "";
+    results.player1100s = match.player1100s?.toString() || "";
+    results.player2100s = match.player2100s?.toString() || "";
   }, [match]);
 
   const closeMatchDialog = () => {
@@ -95,14 +113,35 @@ export const MatchInfoDialog = ({
       player2180s: "",
       player1HF: "",
       player2HF: "",
+      player1avg: "",
+      player2avg: "",
+      player1140s: "",
+      player2140s: "",
+      player1100s: "",
+      player2100s: "",
     });
   };
 
   const updateResult = (res: string, inputVal: string) => {
-    let val = inputVal ? parseInt(inputVal as any) : 0;
+    let val = inputVal || 0;
+
+    if (["player1avg", "player2avg"].includes(res)) {
+      val = parseFloat(val as any);
+      val = Math.round(val * 100) / 100;
+    } else {
+      val = parseInt(inputVal as any);
+    }
+
     if (val < 0) {
       val = 0;
     }
+
+    if (["player1avg", "player2avg"].includes(res)) {
+      if (val > 120) {
+        val = 0;
+      }
+    }
+
     if (["score1", "score2"].includes(res)) {
       if (val > 6) {
         val = 6;
@@ -111,6 +150,16 @@ export const MatchInfoDialog = ({
     if (["player1180s", "player2180s"].includes(res)) {
       if (val > 10) {
         val = 10;
+      }
+    }
+    if (["player1140s", "player2140s"].includes(res)) {
+      if (val > 20) {
+        val = 20;
+      }
+    }
+    if (["player1100s", "player2100s"].includes(res)) {
+      if (val > 20) {
+        val = 20;
       }
     }
     if (["player1HF", "player2HF"].includes(res)) {
@@ -199,6 +248,40 @@ export const MatchInfoDialog = ({
                     <input
                       type="number"
                       className="info"
+                      value={results.player1avg}
+                      onChange={(e: any) => {
+                        updateResult("player1avg", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player1avg}</div>
+                  )}
+                </div>
+                <div className="delimiter"> AVG </div>
+                <div className="stat">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
+                      value={results.player2avg}
+                      onChange={(e: any) => {
+                        updateResult("player2avg", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player2avg}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="result-line">
+                <div className="stat left">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
                       value={results.player1180s}
                       onChange={(e: any) => {
                         updateResult("player1180s", e.target.value);
@@ -226,6 +309,75 @@ export const MatchInfoDialog = ({
                   )}
                 </div>
               </div>
+
+              <div className="result-line">
+                <div className="stat left">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
+                      value={results.player1140s}
+                      onChange={(e: any) => {
+                        updateResult("player1140s", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player1140s}</div>
+                  )}
+                </div>
+                <div className="delimiter"> 140s </div>
+                <div className="stat">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
+                      value={results.player2140s}
+                      onChange={(e: any) => {
+                        updateResult("player2140s", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player2140s}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="result-line">
+                <div className="stat left">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
+                      value={results.player1100s}
+                      onChange={(e: any) => {
+                        updateResult("player1100s", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player1100s}</div>
+                  )}
+                </div>
+                <div className="delimiter"> 100s </div>
+                <div className="stat">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
+                      value={results.player2100s}
+                      onChange={(e: any) => {
+                        updateResult("player2100s", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player2100s}</div>
+                  )}
+                </div>
+              </div>
+
               <div className="result-line">
                 <div className="stat left">
                   {dialogEditMode && (
@@ -293,6 +445,12 @@ export const MatchInfoDialog = ({
                     player2180s: parseInt(results.player2180s) || 0,
                     player1HF: parseInt(results.player1HF) || 0,
                     player2HF: parseInt(results.player2HF) || 0,
+                    player1avg: parseFloat(results.player1avg) || 0,
+                    player2avg: parseFloat(results.player2avg) || 0,
+                    player1140s: parseInt(results.player1140s) || 0,
+                    player2140s: parseInt(results.player2140s) || 0,
+                    player1100s: parseInt(results.player1100s) || 0,
+                    player2100s: parseInt(results.player2100s) || 0,
                     finished:
                       (parseInt(results.score1) || 0) > 0 ||
                       (parseInt(results.score2) || 0) > 0,

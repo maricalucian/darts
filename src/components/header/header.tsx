@@ -4,7 +4,7 @@ import { db } from "../../core/firebase";
 import { Link, useLocation } from "react-router-dom";
 import { AppUser, FirestoreRound } from "../../types";
 import { getAuth } from "firebase/auth";
-import { Box, AppBar, Toolbar, Button } from "@mui/material";
+import { Box, AppBar, Toolbar, Button, Select } from "@mui/material";
 import BallotIcon from "@mui/icons-material/Ballot";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -31,25 +31,26 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import "./header.scss";
-import { ADM } from "../../core/constants";
+import { ADM, COMPETITION_NAMES, COMPETITIONS } from "../../core/constants";
+import { funMode } from "../../core/utils";
 
 type HeaderProps = {
   round: FirestoreRound;
   user: AppUser;
-  funMode: boolean;
+  compId: string;
 };
 
-const switchToFriendlyMode = (fun: boolean) => {
-  if (fun) {
-    localStorage.setItem("competition", "friendly");
-  } else {
-    localStorage.setItem("competition", "duminica23");
-  }
+// const switchToFriendlyMode = (fun: boolean) => {
+//   if (fun) {
+//     localStorage.setItem("competition", "friendly");
+//   } else {
+//     localStorage.setItem("competition", "duminica23");
+//   }
 
-  window.location.reload();
-};
+//   window.location.reload();
+// };
 
-export const Header = ({ round, user, funMode }: HeaderProps): ReactElement => {
+export const Header = ({ round, user, compId }: HeaderProps): ReactElement => {
   const [currentEdition, setCurrentEdition] = useState(0);
   const location = useLocation();
   const [showMenu, setShowMenu] = useState(false);
@@ -102,7 +103,7 @@ export const Header = ({ round, user, funMode }: HeaderProps): ReactElement => {
             Bracket
           </MenuItem>
           <Divider light={true} />
-          {!funMode && (
+          {!funMode(compId) && (
             <MenuItem component={Link} to={"/standings"} onClick={closeMenu}>
               <ListItemIcon>
                 <CupSvg style={{ height: "21px", marginTop: "0px" }} />
@@ -110,18 +111,6 @@ export const Header = ({ round, user, funMode }: HeaderProps): ReactElement => {
               Tournament info
             </MenuItem>
           )}
-          <MenuItem
-            onClick={() => {
-              switchToFriendlyMode(!funMode);
-            }}
-          >
-            <ListItemIcon>
-              {funMode && <RocketLaunchIcon style={{ fontSize: "26px" }} />}
-              {!funMode && <RocketIcon style={{ fontSize: "26px" }} />}
-            </ListItemIcon>
-            {funMode && `Tournament mode`}
-            {!funMode && `Friendly mode`}
-          </MenuItem>
           {user.user?.uid === ADM && <Divider light={true} />}
           {user.user?.uid === ADM && (
             <MenuItem component={Link} to={"/users"} onClick={closeMenu}>
@@ -167,7 +156,7 @@ export const Header = ({ round, user, funMode }: HeaderProps): ReactElement => {
         <AppBar
           position="static"
           sx={{
-            backgroundColor: funMode ? "#17a13d" : "#1976d2",
+            backgroundColor: funMode(compId) ? "#17a13d" : "#1976d2",
           }}
         >
           <Toolbar sx={{ paddingLeft: "0" }}>
@@ -219,8 +208,38 @@ export const Header = ({ round, user, funMode }: HeaderProps): ReactElement => {
             </div>
 
             <b>
-              {funMode && `FRIENDLY`}
-              {!funMode && `TOURNAMENT`}
+              {/* {funMode && `FRIENDLY`}
+              {!funMode && `TOURNAMENT`} */}
+              <Select
+                id="demo-simple-select"
+                value={compId}
+                variant="outlined"
+                // defaultValue=""
+                onChange={(e) => {
+                  // selectRound(e.target.value);
+                  localStorage.setItem("competition", e.target.value);
+                  window.location.reload();
+                }}
+                sx={{
+                  backgroundColor: "#1f5386",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  height: "36px",
+                  borderRadius: "8px",
+                  //@ts-ignore
+                  "& .MuiSvgIcon-root": {
+                    fill: "#fff",
+                  },
+                }}
+              >
+                {COMPETITIONS.map((option: any) => {
+                  return (
+                    <MenuItem key={option} value={option}>
+                      {COMPETITION_NAMES[option]}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
             </b>
           </Toolbar>
         </AppBar>

@@ -28,6 +28,7 @@ import {
 } from "../../firestore/competition";
 import { ADM, API_ENDPOINT } from "../../core/constants";
 import { Button, MenuItem, Select } from "@mui/material";
+import { funMode } from "../../core/utils";
 
 type THomePageProps = {
   competition: Competition;
@@ -35,9 +36,9 @@ type THomePageProps = {
   round: FirestoreRound;
   roundPlayers: TRoundPlayerList;
   popupMatchInfo: (round: number, match: Match) => void;
-  funMode: boolean;
   teams: TTeams;
   user: AppUser;
+  compId: string;
   currendRoundIndex: number;
 };
 
@@ -62,9 +63,9 @@ export const HomePage = ({
   playersMap,
   popupMatchInfo,
   roundPlayers,
-  funMode,
   teams,
   user,
+  compId,
   currendRoundIndex,
 }: THomePageProps): ReactElement => {
   const [displayRound, setDisplayRound] = useState(round);
@@ -124,12 +125,12 @@ export const HomePage = ({
         <>
           <div className="top">
             <div style={{ display: "flex" }}>
-              {funMode && (
+              {funMode(compId) && (
                 <div className={`status ${displayRound.status}`}>
                   Friendly game {displayRound.status}
                 </div>
               )}
-              {!funMode && (
+              {!funMode(compId) && selectOptions.length > 0 && (
                 <>
                   <Select
                     id="demo-simple-select"
@@ -238,7 +239,7 @@ export const HomePage = ({
               popupMatchInfo={popupMatchInfo}
               round={displayRound}
               teams={teams}
-              funMode
+              compId={compId}
             />
           )}
           <div className="box white">

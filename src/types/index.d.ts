@@ -32,6 +32,12 @@ export type Match = {
   player2180s?: number;
   player1HF?: number;
   player2HF?: number;
+  player1avg?: number;
+  player2avg?: number;
+  player1140s?: number;
+  player2140s?: number;
+  player1100s?: number;
+  player2100s?: number;
 };
 
 export type Competition = { [key: number]: Match };
@@ -83,6 +89,12 @@ export type TResults = {
   player1HF: number;
   player2HF: number;
   finished?: boolean;
+  player1avg: number;
+  player2avg: number;
+  player1140s: number;
+  player2140s: number;
+  player1100s: number;
+  player2100s: number;
 };
 
 export type AppUser = {
