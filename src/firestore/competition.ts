@@ -27,9 +27,10 @@ import {
   TStandings,
   TTeams,
 } from "../types";
+import { API_ENDPOINT } from "../core/constants";
 
 const localComp = localStorage.getItem("competition");
-const tournament = localComp || 'funday23';
+const tournament = localComp || "funday23";
 
 console.log(tournament);
 
@@ -375,6 +376,8 @@ export const updateMatchResult = async (
     results,
     { merge: true }
   );
+
+  fetch(`${API_ENDPOINT}/updateStats?tournament=${tournament}`);
   // todo remove this
   // processCompetition(roundIndex);
 };
@@ -447,7 +450,10 @@ export const getStandings = async (compId: string) => {
   return standings;
 };
 
-export const getStandingsAfterRound = async (compId: string, roundIndex: number) => {
+export const getStandingsAfterRound = async (
+  compId: string,
+  roundIndex: number
+) => {
   const standings: TStandings = {};
   const querySnapshot = await getDocs(
     collection(db, `competitions/${compId}/rounds/${roundIndex}/standings`)

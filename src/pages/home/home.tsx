@@ -29,6 +29,7 @@ import {
 import { ADM, API_ENDPOINT } from "../../core/constants";
 import { Button, MenuItem, Select } from "@mui/material";
 import { funMode } from "../../core/utils";
+import { useNavigate } from "react-router-dom";
 
 type THomePageProps = {
   competition: Competition;
@@ -71,6 +72,7 @@ export const HomePage = ({
   const [displayRound, setDisplayRound] = useState(round);
   const [displayPlayers, setDisplayPlayers] = useState(roundPlayers);
   const [selectOptions, setSelectOptions] = useState([] as any);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const selectOptions = [];
@@ -268,7 +270,13 @@ export const HomePage = ({
                 })
                 .map((playerId) => {
                   return (
-                    <div key={playerId} className="player-row">
+                    <div
+                      key={playerId}
+                      className="player-row"
+                      onClick={() => {
+                        navigate(`/player/${playerId}`);
+                      }}
+                    >
                       <div className="rank">
                         {displayPlayers[playerId]?.rank || "-"}
                       </div>
@@ -294,7 +302,8 @@ export const HomePage = ({
                       </div>
                       <IconButton
                         edge="end"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (
                             // eslint-disable-next-line no-restricted-globals
                             confirm(

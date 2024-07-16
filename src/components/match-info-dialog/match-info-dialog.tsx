@@ -31,6 +31,8 @@ type TResultsString = {
   player2180s: string;
   player1HF: string;
   player2HF: string;
+  player1BL: string;
+  player2BL: string;
   player1avg: string;
   player2avg: string;
   player1140s: string;
@@ -73,6 +75,7 @@ export const MatchInfoDialog = ({
   teams,
 }: TMatchInfoProps): ReactElement => {
   const [dialogEditMode, setDialogEditMode] = useState(false);
+  const [errors, setErrors] = useState([] as any);
   const [results, setResults] = useState({
     score1: "",
     score2: "",
@@ -95,6 +98,8 @@ export const MatchInfoDialog = ({
     results.player2180s = match.player2180s?.toString() || "";
     results.player1HF = match.player1HF?.toString() || "";
     results.player2HF = match.player2HF?.toString() || "";
+    results.player1BL = match.player1BL?.toString() || "";
+    results.player2BL = match.player2BL?.toString() || "";
     results.player1avg = match.player1avg?.toString() || "";
     results.player2avg = match.player2avg?.toString() || "";
     results.player1140s = match.player1140s?.toString() || "";
@@ -113,6 +118,8 @@ export const MatchInfoDialog = ({
       player2180s: "",
       player1HF: "",
       player2HF: "",
+      player1BL: "",
+      player2BL: "",
       player1avg: "",
       player2avg: "",
       player1140s: "",
@@ -121,6 +128,31 @@ export const MatchInfoDialog = ({
       player2100s: "",
     });
   };
+
+  const checkInputs = () => {
+    let errorList = [];
+    if(!results.score1) {
+      errorList.push('score1');
+    }
+    if(!results.score2) {
+      errorList.push('score2');
+    }
+    if(parseFloat(results.player1avg || '0') < 10) {
+      errorList.push('player1avg');
+    }
+    if(parseFloat(results.player2avg || '0') < 10) {
+      errorList.push('player2avg');
+    }
+    if(parseInt(results.player1BL || '0') < 9) {
+      errorList.push('player1BL');
+    }
+    if(parseInt(results.player2BL || '0') < 9) {
+      errorList.push('player2BL');
+    }
+    setErrors(errorList);
+
+    return errorList.length === 0;
+  }
 
   const updateResult = (res: string, inputVal: string) => {
     let val = inputVal || 0;
@@ -166,6 +198,11 @@ export const MatchInfoDialog = ({
       if (val > 170) {
         val = 170;
       }
+    }
+    if (["player1BL", "player2BL"].includes(res)) {
+      // if (val < 9) {
+      //   val = 9;
+      // }
     }
     setResults({ ...results, ...{ [res]: val.toString() } });
   };
@@ -215,6 +252,9 @@ export const MatchInfoDialog = ({
                     <input
                       type="number"
                       className="score-tab"
+                      style={{
+                        backgroundColor: errors.includes('score1') ? '#fee5e5' : '#fff'
+                      }}
                       value={results.score1}
                       onChange={(e: any) => {
                         updateResult("score1", e.target.value);
@@ -232,6 +272,9 @@ export const MatchInfoDialog = ({
                       type="number"
                       className="score-tab"
                       value={results.score2}
+                      style={{
+                        backgroundColor: errors.includes('score2') ? '#fee5e5' : '#fff'
+                      }}
                       onChange={(e: any) => {
                         updateResult("score2", e.target.value);
                       }}
@@ -249,6 +292,10 @@ export const MatchInfoDialog = ({
                       type="number"
                       className="info"
                       value={results.player1avg}
+
+                      style={{
+                        backgroundColor: errors.includes('player1avg') ? '#fee5e5' : '#fff'
+                      }}
                       onChange={(e: any) => {
                         updateResult("player1avg", e.target.value);
                       }}
@@ -265,6 +312,9 @@ export const MatchInfoDialog = ({
                       type="number"
                       className="info"
                       value={results.player2avg}
+                      style={{
+                        backgroundColor: errors.includes('player2avg') ? '#fee5e5' : '#fff'
+                      }}
                       onChange={(e: any) => {
                         updateResult("player2avg", e.target.value);
                       }}
@@ -391,7 +441,9 @@ export const MatchInfoDialog = ({
                     />
                   )}
                   {!dialogEditMode && (
-                    <div className="info">{match.player1HF}</div>
+                    <div className="info">
+                      {match.player1HF !== 0 && match.player1HF}
+                    </div>
                   )}
                 </div>
                 <div className="delimiter"> HF </div>
@@ -407,7 +459,53 @@ export const MatchInfoDialog = ({
                     />
                   )}
                   {!dialogEditMode && (
-                    <div className="info">{match.player2HF}</div>
+                    <div className="info">
+                      {match.player2HF !== 0 && match.player2HF}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="result-line">
+                <div className="stat left">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
+                      value={results.player1BL}
+                      style={{
+                        backgroundColor: errors.includes('player1BL') ? '#fee5e5' : '#fff'
+                      }}
+                      onChange={(e: any) => {
+                        updateResult("player1BL", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">
+                      {match.player1BL !== 0 && match.player1BL}
+                    </div>
+                  )}
+                </div>
+                <div className="delimiter"> BLeg </div>
+                <div className="stat">
+                  {dialogEditMode && (
+                    <input
+                      type="number"
+                      className="info"
+                      value={results.player2BL}
+                      style={{
+                        backgroundColor: errors.includes('player2BL') ? '#fee5e5' : '#fff'
+                      }}
+                      onChange={(e: any) => {
+                        updateResult("player2BL", e.target.value);
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">
+                      {match.player2BL !== 0 && match.player2BL}
+                    </div>
                   )}
                 </div>
               </div>
@@ -438,25 +536,29 @@ export const MatchInfoDialog = ({
               <Button
                 variant="contained"
                 onClick={() => {
-                  updateMatchResult(round.round, match.number, {
-                    score1: parseInt(results.score1) || 0,
-                    score2: parseInt(results.score2) || 0,
-                    player1180s: parseInt(results.player1180s) || 0,
-                    player2180s: parseInt(results.player2180s) || 0,
-                    player1HF: parseInt(results.player1HF) || 0,
-                    player2HF: parseInt(results.player2HF) || 0,
-                    player1avg: parseFloat(results.player1avg) || 0,
-                    player2avg: parseFloat(results.player2avg) || 0,
-                    player1140s: parseInt(results.player1140s) || 0,
-                    player2140s: parseInt(results.player2140s) || 0,
-                    player1100s: parseInt(results.player1100s) || 0,
-                    player2100s: parseInt(results.player2100s) || 0,
-                    finished:
-                      (parseInt(results.score1) || 0) > 0 ||
-                      (parseInt(results.score2) || 0) > 0,
-                  });
+                  if (checkInputs()) {
+                    updateMatchResult(round.round, match.number, {
+                      score1: parseInt(results.score1) || 0,
+                      score2: parseInt(results.score2) || 0,
+                      player1180s: parseInt(results.player1180s) || 0,
+                      player2180s: parseInt(results.player2180s) || 0,
+                      player1HF: parseInt(results.player1HF) || 0,
+                      player2HF: parseInt(results.player2HF) || 0,
+                      player1BL: parseInt(results.player1BL) || 0,
+                      player2BL: parseInt(results.player2BL) || 0,
+                      player1avg: parseFloat(results.player1avg) || 0,
+                      player2avg: parseFloat(results.player2avg) || 0,
+                      player1140s: parseInt(results.player1140s) || 0,
+                      player2140s: parseInt(results.player2140s) || 0,
+                      player1100s: parseInt(results.player1100s) || 0,
+                      player2100s: parseInt(results.player2100s) || 0,
+                      finished:
+                        (parseInt(results.score1) || 0) > 0 ||
+                        (parseInt(results.score2) || 0) > 0,
+                    });
 
-                  closeMatchDialog();
+                    closeMatchDialog();
+                  }
                 }}
               >
                 Save

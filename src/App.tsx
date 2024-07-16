@@ -49,6 +49,7 @@ import {
   ContentCut,
   ContentPaste,
 } from "@mui/icons-material";
+import { PlayerPage } from "./pages/player/player";
 
 const emptyRound: FirestoreRound = {
   players: [],
@@ -239,6 +240,18 @@ function App() {
                   round={round}
                   compId={compId}
                   currendRoundIndex={currendRoundIndex}
+                />
+              }
+            />
+
+            <Route
+              path="/player/:uid"
+              element={
+                <PlayerPage
+                  competition={competition}
+                  playersMap={playersMap}
+                  round={round}
+                  compId={compId}
                 />
               }
             />

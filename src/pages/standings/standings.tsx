@@ -161,7 +161,7 @@ export const StandingsPage = ({
             </div>
           </div>
           <div className="info-line-big">
-            <div className="val">{entries * 5}</div>
+            <div className="val">{entries * 10}</div>
             <div className="def">RON masters pool</div>
           </div>
         </div>

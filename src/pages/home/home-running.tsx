@@ -10,7 +10,7 @@ import {
 import { BLANK } from "../../core/constants";
 
 import "./home.scss";
-import { prizeSturcture } from "../../core/competition";
+import { hfPrizeStructure, prizeSturcture } from "../../core/competition";
 import { funMode } from "../../core/utils";
 
 export const getPlayerNameGame = (
@@ -47,17 +47,22 @@ export const getPrizes = (
   places: number = 0
 ) => {
   let prizesMap = {};
+  let hfPrize = 0;
   //@ts-ignore
   if (!places || Object.keys(prizeSturcture[places] || {}) < 1) {
     Object.keys(prizeSturcture).forEach((k) => {
       if (parseInt(k) < totalPlayers) {
         // @ts-ignore
         prizesMap = prizeSturcture[k];
+        // @ts-ignore
+        hfPrize = hfPrizeStructure[k];
       }
     });
   } else {
     //@ts-ignore
     prizesMap = prizeSturcture[places];
+    //@ts-ignore
+    hfPrize = hfPrizeStructure[places];
   }
 
   const total = totalPlayers * fee;
@@ -70,6 +75,11 @@ export const getPrizes = (
       prize: Math.round(total * (prizesMap[k] / 100)),
     });
   });
+
+  prize.push({
+    rank: 'HF',
+    prize: Math.round(total * (hfPrize / 100)),
+  })
 
   return prize;
 };

@@ -32,6 +32,8 @@ export type Match = {
   player2180s?: number;
   player1HF?: number;
   player2HF?: number;
+  player1BL?: number;
+  player2BL?: number;
   player1avg?: number;
   player2avg?: number;
   player1140s?: number;
@@ -88,6 +90,8 @@ export type TResults = {
   player2180s: number;
   player1HF: number;
   player2HF: number;
+  player1BL: number;
+  player2BL: number;
   finished?: boolean;
   player1avg: number;
   player2avg: number;
@@ -96,6 +100,24 @@ export type TResults = {
   player1100s: number;
   player2100s: number;
 };
+
+export type TStat = {
+  "180s"?: number;
+  "100s"?: number;
+  "140s"?: number;
+  avg?: number;
+  legs?: number;
+  matches?: number;
+  won?: number;
+  lost?: number;
+  hf?: number;
+};
+
+
+export type TStats = {
+  [key: string]: TStat;
+};
+
 
 export type AppUser = {
   loggedIn: boolean;
