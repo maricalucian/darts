@@ -143,12 +143,12 @@ export const MatchInfoDialog = ({
     if(parseFloat(results.player2avg || '0') < 10) {
       errorList.push('player2avg');
     }
-    if(parseInt(results.player1BL || '0') < 9) {
-      errorList.push('player1BL');
-    }
-    if(parseInt(results.player2BL || '0') < 9) {
-      errorList.push('player2BL');
-    }
+    // if(parseInt(results.player1BL || '0') < 9) {
+    //   errorList.push('player1BL');
+    // }
+    // if(parseInt(results.player2BL || '0') < 9) {
+    //   errorList.push('player2BL');
+    // }
     setErrors(errorList);
 
     return errorList.length === 0;
@@ -158,15 +158,17 @@ export const MatchInfoDialog = ({
     let val = inputVal || 0;
 
     if (["player1avg", "player2avg"].includes(res)) {
-      val = parseFloat(val as any);
-      val = Math.round(val * 100) / 100;
+      // val = parseFloat(val as any);
+      // val = Math.round(val * 100) / 100;
     } else {
       val = parseInt(inputVal as any);
+      if (val < 0) {
+        val = 0;
+      }
     }
 
-    if (val < 0) {
-      val = 0;
-    }
+    // val = parseInt(inputVal as any);
+
 
     if (["player1avg", "player2avg"].includes(res)) {
       if (val > 120) {
@@ -289,7 +291,6 @@ export const MatchInfoDialog = ({
                 <div className="stat left">
                   {dialogEditMode && (
                     <input
-                      type="number"
                       className="info"
                       value={results.player1avg}
 
@@ -309,7 +310,6 @@ export const MatchInfoDialog = ({
                 <div className="stat">
                   {dialogEditMode && (
                     <input
-                      type="number"
                       className="info"
                       value={results.player2avg}
                       style={{
