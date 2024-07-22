@@ -111,6 +111,8 @@ export type TStat = {
   won?: number;
   lost?: number;
   hf?: number;
+  legsWon?: number;
+  legsLost?: number;
 };
 
 
@@ -139,6 +141,16 @@ export type TStanding = {
   one80s?: number;
   points?: number;
   rank?: number;
+  "180s"?: number;
+  "100s"?: number;
+  "140s"?: number;
+  avg?: number;
+  legs?: number;
+  matches?: number;
+  won?: number;
+  lost?: number;
+  legsWon?: number;
+  legsLost?: number;
 };
 export type TStandings = {
   [key: string]: TStanding;

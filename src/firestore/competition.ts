@@ -450,6 +450,20 @@ export const getStandings = async (compId: string) => {
   return standings;
 };
 
+export const getplayerStandings = async (compId: string, uid: string) => {
+  const standings: TStandings = {};
+  return await getDoc(doc(db, `competitions/${compId}/standings/${uid}`)).then(
+    (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        return data as TStanding;
+      } else {
+        return {} as TStanding;
+      }
+    }
+  );
+};
+
 export const getStandingsAfterRound = async (
   compId: string,
   roundIndex: number
