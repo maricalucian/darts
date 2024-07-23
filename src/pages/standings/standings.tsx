@@ -72,6 +72,9 @@ const columns: GridColDef[] = [
 const Photo = ({ uid }: any) => {
   const [image, setImage] = useState("");
   useEffect(() => {
+    if (!uid) {
+      return;
+    }
     const storageRef = ref(storage, `images/${uid}`);
 
     getDownloadURL(storageRef)
@@ -315,7 +318,7 @@ export const StandingsPage = ({
                         {player.one80s ? player.one80s : ""}
                       </td>
                       <td className="player-hf">
-                        {player.hf ? player.hf : ""}
+                        {player.hf && player.hf >= 100 ? player.hf : ""}
                       </td>
                     </tr>
                   );
