@@ -12,6 +12,8 @@ import { BLANK } from "../../core/constants";
 import "./home.scss";
 import { hfPrizeStructure, prizeSturcture } from "../../core/competition";
 import { funMode } from "../../core/utils";
+import { getDownloadURL, ref } from "firebase/storage";
+import { storage } from "../../core/firebase";
 
 export const getPlayerNameGame = (
   round: FirestoreRound,
@@ -77,11 +79,38 @@ export const getPrizes = (
   });
 
   prize.push({
-    rank: 'HF',
+    rank: "HF",
     prize: Math.round(total * (hfPrize / 100)),
-  })
+  });
 
   return prize;
+};
+
+const Photo = ({ uid }: any) => {
+  const [image, setImage] = useState("/player.jpeg");
+  useEffect(() => {
+    const storageRef = ref(storage, `images/${uid}`);
+
+    getDownloadURL(storageRef)
+      .then((res) => {
+        setImage(res);
+      })
+      .catch((e) => {
+        setImage("/player.jpeg");
+      });
+  }, [uid]);
+  return (
+    <img
+      src={image}
+      style={{
+        borderRadius: "50%",
+        width: "36px",
+        aspectRatio: 1,
+        objectFit: "cover",
+        opacity: 0.6,
+      }}
+    />
+  );
 };
 
 export const HomeRunning = ({
@@ -157,9 +186,9 @@ export const HomeRunning = ({
       Object.keys(roundPlayers).forEach((uid) => {
         const player = roundPlayers[uid];
         if (player?.hf && player?.hf >= hf && player?.hf > 1) {
-          if(player?.hf == hf) {
+          if (player?.hf == hf) {
             hf = player.hf;
-            hfPlayer = hfPlayer + ' ' + playersMap[uid].name;
+            hfPlayer = hfPlayer + " " + playersMap[uid].name;
           } else {
             hf = player.hf;
             hfPlayer = playersMap[uid].name;
@@ -205,6 +234,15 @@ export const HomeRunning = ({
                   key={match.number}
                 >
                   <div className="match-no">{match.number}</div>
+                  {/* <div
+                    style={{
+                      position: "absolute",
+                      top: "6px",
+                      left: "10px",
+                    }}
+                  >
+                    <Photo uid={match.player1} />
+                  </div> */}
                   <div className="p1">
                     {getPlayerNameGame(
                       round,
@@ -222,6 +260,15 @@ export const HomeRunning = ({
                       match.player2 || ""
                     )}
                   </div>
+                  {/* <div
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      top: "6px",
+                    }}
+                  >
+                    <Photo uid={match.player2} />
+                  </div> */}
                 </div>
               ))}
             </div>
@@ -256,7 +303,7 @@ export const HomeRunning = ({
               <div className="def">high out</div>
             </div>
             <div className="info-line-big">
-              <div style={{width: '32px'}}></div>
+              <div style={{ width: "32px" }}></div>
               <div className="def">{hfPlayer}</div>
             </div>
             <div style={{ textAlign: "center" }}>

@@ -22,8 +22,10 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import "./home.scss";
 import { HomeRunning } from "./home-running";
 import {
+  addPlayerToRound,
   getRound,
   getRoundAndPlayers,
+  removeRoundPlayer,
   setPlayerPaid,
 } from "../../firestore/competition";
 import { ADM, API_ENDPOINT } from "../../core/constants";
@@ -41,6 +43,7 @@ type THomePageProps = {
   user: AppUser;
   compId: string;
   currendRoundIndex: number;
+  usersMap: { [key: string]: string };
 };
 
 export const getPlayerNameLong = (
@@ -68,10 +71,13 @@ export const HomePage = ({
   user,
   compId,
   currendRoundIndex,
+  usersMap,
 }: THomePageProps): ReactElement => {
   const [displayRound, setDisplayRound] = useState(round);
   const [displayPlayers, setDisplayPlayers] = useState(roundPlayers);
   const [selectOptions, setSelectOptions] = useState([] as any);
+  const [userCanRegister, setUserCanRegister] = useState(false);
+  const [userIsRegistered, setUserIsRegistered] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -101,6 +107,13 @@ export const HomePage = ({
       setDisplayPlayers(roundPlayers);
     }
   }, [currendRoundIndex, displayRound.round, round.round, roundPlayers]);
+
+  useEffect(() => {
+    if (compId === "funday24" && user.user?.uid && usersMap[user.user?.uid]) {
+      setUserCanRegister(true);
+      setUserIsRegistered(Object.keys(roundPlayers).includes(usersMap[user.user?.uid]))
+    }
+  }, [user.user?.uid, usersMap, roundPlayers]);
 
   const selectRound = (round: any) => {
     if (round === currendRoundIndex) {
@@ -243,6 +256,43 @@ export const HomePage = ({
               teams={teams}
               compId={compId}
             />
+          )}
+          {userCanRegister && (
+            <Button
+              variant="contained"
+              color="success"
+              style={{
+                width: "146px",
+                height: "36px",
+                fontSize: "16px",
+                fontWeight: "bold",
+                borderRadius: "8px",
+                marginBottom: "8px",
+              }}
+              sx={{
+                marginBottom: 1,
+              }}
+              onClick={() => {
+                if (
+                  // eslint-disable-next-line no-restricted-globals
+                  confirm(`Are you sure you want to ${userIsRegistered && 'un'}register for this round?`)
+                ) {
+                  if (user.user?.uid) {
+                    console.log(usersMap[user.user?.uid]);
+                    if(userIsRegistered) {
+                      removeRoundPlayer(round.round, usersMap[user.user?.uid]);
+                      setUserIsRegistered(false);
+                    } else {
+                      addPlayerToRound(round.round, usersMap[user.user?.uid]);
+                      setUserIsRegistered(true);
+                    }
+                  }
+                }
+              }}
+            >
+              {userIsRegistered && <>Unregister</>}
+              {!userIsRegistered && <>Register</>}
+            </Button>
           )}
           <div className="box white">
             <div className="box-label">

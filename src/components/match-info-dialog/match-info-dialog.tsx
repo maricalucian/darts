@@ -131,17 +131,17 @@ export const MatchInfoDialog = ({
 
   const checkInputs = () => {
     let errorList = [];
-    if(!results.score1) {
-      errorList.push('score1');
+    if (!results.score1) {
+      errorList.push("score1");
     }
-    if(!results.score2) {
-      errorList.push('score2');
+    if (!results.score2) {
+      errorList.push("score2");
     }
-    if(parseFloat(results.player1avg || '0') < 10) {
-      errorList.push('player1avg');
+    if (parseFloat(results.player1avg || "0") < 10) {
+      errorList.push("player1avg");
     }
-    if(parseFloat(results.player2avg || '0') < 10) {
-      errorList.push('player2avg');
+    if (parseFloat(results.player2avg || "0") < 10) {
+      errorList.push("player2avg");
     }
     // if(parseInt(results.player1BL || '0') < 9) {
     //   errorList.push('player1BL');
@@ -152,7 +152,7 @@ export const MatchInfoDialog = ({
     setErrors(errorList);
 
     return errorList.length === 0;
-  }
+  };
 
   const updateResult = (res: string, inputVal: string) => {
     let val = inputVal || 0;
@@ -168,7 +168,6 @@ export const MatchInfoDialog = ({
     }
 
     // val = parseInt(inputVal as any);
-
 
     if (["player1avg", "player2avg"].includes(res)) {
       if (val > 120) {
@@ -255,7 +254,9 @@ export const MatchInfoDialog = ({
                       type="number"
                       className="score-tab"
                       style={{
-                        backgroundColor: errors.includes('score1') ? '#fee5e5' : '#fff'
+                        backgroundColor: errors.includes("score1")
+                          ? "#fee5e5"
+                          : "#fff",
                       }}
                       value={results.score1}
                       onChange={(e: any) => {
@@ -275,7 +276,9 @@ export const MatchInfoDialog = ({
                       className="score-tab"
                       value={results.score2}
                       style={{
-                        backgroundColor: errors.includes('score2') ? '#fee5e5' : '#fff'
+                        backgroundColor: errors.includes("score2")
+                          ? "#fee5e5"
+                          : "#fff",
                       }}
                       onChange={(e: any) => {
                         updateResult("score2", e.target.value);
@@ -287,44 +290,6 @@ export const MatchInfoDialog = ({
                   )}
                 </div>
               </div>
-              <div className="result-line">
-                <div className="stat left">
-                  {dialogEditMode && (
-                    <input
-                      className="info"
-                      value={results.player1avg}
-
-                      style={{
-                        backgroundColor: errors.includes('player1avg') ? '#fee5e5' : '#fff'
-                      }}
-                      onChange={(e: any) => {
-                        updateResult("player1avg", e.target.value);
-                      }}
-                    />
-                  )}
-                  {!dialogEditMode && (
-                    <div className="info">{match.player1avg}</div>
-                  )}
-                </div>
-                <div className="delimiter"> AVG </div>
-                <div className="stat">
-                  {dialogEditMode && (
-                    <input
-                      className="info"
-                      value={results.player2avg}
-                      style={{
-                        backgroundColor: errors.includes('player2avg') ? '#fee5e5' : '#fff'
-                      }}
-                      onChange={(e: any) => {
-                        updateResult("player2avg", e.target.value);
-                      }}
-                    />
-                  )}
-                  {!dialogEditMode && (
-                    <div className="info">{match.player2avg}</div>
-                  )}
-                </div>
-              </div>
 
               <div className="result-line">
                 <div className="stat left">
@@ -332,30 +297,30 @@ export const MatchInfoDialog = ({
                     <input
                       type="number"
                       className="info"
-                      value={results.player1180s}
+                      value={results.player1100s}
                       onChange={(e: any) => {
-                        updateResult("player1180s", e.target.value);
+                        updateResult("player1100s", e.target.value);
                       }}
                     />
                   )}
                   {!dialogEditMode && (
-                    <div className="info">{match.player1180s}</div>
+                    <div className="info">{match.player1100s}</div>
                   )}
                 </div>
-                <div className="delimiter"> 180s </div>
+                <div className="delimiter"> 100s </div>
                 <div className="stat">
                   {dialogEditMode && (
                     <input
                       type="number"
                       className="info"
-                      value={results.player2180s}
+                      value={results.player2100s}
                       onChange={(e: any) => {
-                        updateResult("player2180s", e.target.value);
+                        updateResult("player2100s", e.target.value);
                       }}
                     />
                   )}
                   {!dialogEditMode && (
-                    <div className="info">{match.player2180s}</div>
+                    <div className="info">{match.player2100s}</div>
                   )}
                 </div>
               </div>
@@ -400,30 +365,30 @@ export const MatchInfoDialog = ({
                     <input
                       type="number"
                       className="info"
-                      value={results.player1100s}
+                      value={results.player1180s}
                       onChange={(e: any) => {
-                        updateResult("player1100s", e.target.value);
+                        updateResult("player1180s", e.target.value);
                       }}
                     />
                   )}
                   {!dialogEditMode && (
-                    <div className="info">{match.player1100s}</div>
+                    <div className="info">{match.player1180s}</div>
                   )}
                 </div>
-                <div className="delimiter"> 100s </div>
+                <div className="delimiter"> 180s </div>
                 <div className="stat">
                   {dialogEditMode && (
                     <input
                       type="number"
                       className="info"
-                      value={results.player2100s}
+                      value={results.player2180s}
                       onChange={(e: any) => {
-                        updateResult("player2100s", e.target.value);
+                        updateResult("player2180s", e.target.value);
                       }}
                     />
                   )}
                   {!dialogEditMode && (
-                    <div className="info">{match.player2100s}</div>
+                    <div className="info">{match.player2180s}</div>
                   )}
                 </div>
               </div>
@@ -474,7 +439,9 @@ export const MatchInfoDialog = ({
                       className="info"
                       value={results.player1BL}
                       style={{
-                        backgroundColor: errors.includes('player1BL') ? '#fee5e5' : '#fff'
+                        backgroundColor: errors.includes("player1BL")
+                          ? "#fee5e5"
+                          : "#fff",
                       }}
                       onChange={(e: any) => {
                         updateResult("player1BL", e.target.value);
@@ -495,7 +462,9 @@ export const MatchInfoDialog = ({
                       className="info"
                       value={results.player2BL}
                       style={{
-                        backgroundColor: errors.includes('player2BL') ? '#fee5e5' : '#fff'
+                        backgroundColor: errors.includes("player2BL")
+                          ? "#fee5e5"
+                          : "#fff",
                       }}
                       onChange={(e: any) => {
                         updateResult("player2BL", e.target.value);
@@ -506,6 +475,60 @@ export const MatchInfoDialog = ({
                     <div className="info">
                       {match.player2BL !== 0 && match.player2BL}
                     </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="result-line">
+                <div className="stat left">
+                  {dialogEditMode && (
+                    <input
+                      className="info"
+                      lang="en"
+                      type="text"
+                      value={results.player1avg}
+                      inputMode="decimal"
+                      pattern="[0-9]*[.,]?[0-9]+"
+                      style={{
+                        backgroundColor: errors.includes("player1avg")
+                          ? "#fee5e5"
+                          : "#fff",
+                      }}
+                      onChange={(e: any) => {
+                        if (/^\d*([.,]\d{0,2})?$/.test(e.target.value)) {
+                          updateResult("player1avg", e.target.value);
+                        }
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player1avg}</div>
+                  )}
+                </div>
+                <div className="delimiter"> AVG </div>
+                <div className="stat">
+                  {dialogEditMode && (
+                    <input
+                      className="info"
+                      lang="en"
+                      type="text"
+                      value={results.player2avg}
+                      inputMode="decimal"
+                      pattern="[0-9]*[.,]?[0-9]+"
+                      style={{
+                        backgroundColor: errors.includes("player2avg")
+                          ? "#fee5e5"
+                          : "#fff",
+                      }}
+                      onChange={(e: any) => {
+                        if (/^\d*([.,]\d{0,2})?$/.test(e.target.value)) {
+                          updateResult("player2avg", e.target.value);
+                        }
+                      }}
+                    />
+                  )}
+                  {!dialogEditMode && (
+                    <div className="info">{match.player2avg}</div>
                   )}
                 </div>
               </div>

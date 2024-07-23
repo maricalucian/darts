@@ -24,6 +24,9 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { storage } from "../../core/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 
 type TStandingsPageProps = {
   competition: Competition;
@@ -66,6 +69,39 @@ const columns: GridColDef[] = [
   { field: "hf", headerName: "HF", width: 40 },
 ];
 
+const Photo = ({ uid }: any) => {
+  const [image, setImage] = useState("");
+  useEffect(() => {
+    const storageRef = ref(storage, `images/${uid}`);
+
+    getDownloadURL(storageRef)
+      .then((res) => {
+        setImage(res);
+      })
+      .catch((e) => {
+        setImage("/player.jpeg");
+      });
+  }, [uid]);
+  if (!image) {
+    return <></>;
+  }
+  return (
+    <img
+      src={image}
+      style={{
+        borderRadius: "50%",
+        width: "38px",
+        aspectRatio: 1,
+        objectFit: "cover",
+        position: "absolute",
+        opacity: 1,
+        right: 0,
+        top: 0,
+      }}
+    />
+  );
+};
+
 export const StandingsPage = ({
   round,
   competition,
@@ -73,19 +109,25 @@ export const StandingsPage = ({
   popupMatchInfo,
   roundPlayers,
   currendRoundIndex,
-  compId
+  compId,
 }: TStandingsPageProps): ReactElement => {
   const [records, setRecords] = useState({} as any);
   const [standings, setStandings] = useState([] as any);
   const [entries, setEntries] = useState(0);
   const [selectOptions, setSelectOptions] = useState([] as any);
   const [selectedRound, setSelectedRound] = useState(currendRoundIndex);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const selectOptions = [];
-    for (let i = 1; i <= currendRoundIndex; i++) {
+    let max = currendRoundIndex;
+    if (round.status !== "completed" && max > 1) {
+      max = max - 1;
+    }
+    for (let i = 1; i <= max; i++) {
       selectOptions.push(i);
     }
+    setSelectedRound(max);
     setSelectOptions(selectOptions);
   }, [currendRoundIndex]);
 
@@ -98,17 +140,26 @@ export const StandingsPage = ({
       setEntries(data.totalEntries || 0);
     });
     getStandings(compId).then((data: TStandings) => {
+      const stangings = Object.keys(data).map((playerId) => {
+        return {
+          id: playerId,
+          name: playersMap[playerId].name,
+          points: data[playerId].points,
+          one80s: data[playerId].one80s,
+          hf: data[playerId].hf,
+          rank: data[playerId].rank,
+          bonus: `${getBonusForRank(data[playerId].rank || 99)}%`,
+        };
+      });
       setStandings(
-        Object.keys(data).map((playerId) => {
-          return {
-            id: playerId,
-            name: playersMap[playerId].name,
-            points: data[playerId].points,
-            one80s: data[playerId].one80s,
-            hf: data[playerId].hf,
-            rank: data[playerId].rank,
-            bonus: `${getBonusForRank(data[playerId].rank || 99)}%`,
-          };
+        stangings.sort((a: any, b: any) => {
+          if ((a?.rank || 0) > (b?.rank || 0)) {
+            return 1;
+          } else if ((a?.rank || 0) < (b?.rank || 0)) {
+            return -1;
+          } else {
+            return 0;
+          }
         })
       );
     });
@@ -117,17 +168,26 @@ export const StandingsPage = ({
   const selectRound = (round: any) => {
     setSelectedRound(round);
     getStandingsAfterRound(compId, round).then((data: TStandings) => {
+      const stangings = Object.keys(data).map((playerId) => {
+        return {
+          id: playerId,
+          name: playersMap[playerId].name,
+          points: data[playerId].points,
+          one80s: data[playerId].one80s,
+          hf: data[playerId].hf,
+          rank: data[playerId].rank,
+          bonus: `${getBonusForRank(data[playerId].rank || 99)}%`,
+        };
+      });
       setStandings(
-        Object.keys(data).map((playerId) => {
-          return {
-            id: playerId,
-            name: playersMap[playerId].name,
-            points: data[playerId].points,
-            one80s: data[playerId].one80s,
-            hf: data[playerId].hf,
-            rank: data[playerId].rank,
-            bonus: `${getBonusForRank(data[playerId].rank || 99)}%`,
-          };
+        stangings.sort((a: any, b: any) => {
+          if ((a?.rank || 0) > (b?.rank || 0)) {
+            return 1;
+          } else if ((a?.rank || 0) < (b?.rank || 0)) {
+            return -1;
+          } else {
+            return 0;
+          }
         })
       );
     });
@@ -141,6 +201,14 @@ export const StandingsPage = ({
         </div>
         <div className="stats">
           <div className="info-line-big">
+            <div className="val">{standings[0]?.points}</div>
+            <div className="def">
+              Leader {playersMap[standings[0]?.id]?.name}
+            </div>
+
+            <Photo uid={standings[0]?.id} />
+          </div>
+          <div className="info-line-big">
             <div className="val">{records?.one80s}</div>
             <div className="def">
               180's by{" "}
@@ -148,6 +216,9 @@ export const StandingsPage = ({
                 return playersMap?.[player.player]?.name + " ";
               })}
             </div>
+            {records.one80sPlayers?.[0] && (
+              <Photo uid={records?.one80sPlayers[0]?.player} />
+            )}
           </div>
           <div className="info-line-big">
             <div className="val">{records?.hf}</div>
@@ -158,6 +229,9 @@ export const StandingsPage = ({
                   player.round
                 })`;
               })}
+              {records.hfPlayers?.[0] && (
+                <Photo uid={records?.hfPlayers[0]?.player} />
+              )}
             </div>
           </div>
           <div className="info-line-big">
@@ -184,7 +258,7 @@ export const StandingsPage = ({
                 // fontWeight: "bold",
                 height: "28px",
                 borderRadius: "8px",
-                outline: 'none',
+                outline: "none",
                 //@ts-ignore
                 // "& .MuiSvgIcon-root": {
                 //   fill: "#fff",
@@ -213,18 +287,24 @@ export const StandingsPage = ({
                 <td className="player-hf">HF</td>
               </tr>
               {standings
-                .sort((a: any, b: any) => {
-                  if ((a?.rank || 0) > (b?.rank || 0)) {
-                    return 1;
-                  } else if ((a?.rank || 0) < (b?.rank || 0)) {
-                    return -1;
-                  } else {
-                    return 0;
-                  }
-                })
+                // .sort((a: any, b: any) => {
+                //   if ((a?.rank || 0) > (b?.rank || 0)) {
+                //     return 1;
+                //   } else if ((a?.rank || 0) < (b?.rank || 0)) {
+                //     return -1;
+                //   } else {
+                //     return 0;
+                //   }
+                // })
                 .map((player: any) => {
                   return (
-                    <tr key={player.id} className="player-row">
+                    <tr
+                      key={player.id}
+                      className="player-row"
+                      onClick={() => {
+                        navigate(`/player/${player.id}`);
+                      }}
+                    >
                       <td className="rank">{player?.rank || "-"}</td>
                       <td className="player-bonus">{player.bonus}</td>
                       <td className="player-name">

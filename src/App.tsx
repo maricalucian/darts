@@ -171,6 +171,7 @@ function App() {
                   teams={teams}
                   competition={competition}
                   playersMap={playersMap}
+                  usersMap={usersMap}
                   popupMatchInfo={showMatchInfo}
                   round={round}
                   compId={compId}
@@ -252,6 +253,8 @@ function App() {
                   playersMap={playersMap}
                   round={round}
                   compId={compId}
+                  usersMap={usersMap}
+                  authUid={user.user?.uid || ""}
                 />
               }
             />

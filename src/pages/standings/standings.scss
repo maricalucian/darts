@@ -16,11 +16,22 @@
     // background-color: #9a9a9a;
   }
 
+  .stats {
+    .info-line-big {
+      margin: 12px 0;
+      position: relative;
+    }
+
+    .def {
+    }
+  }
+
   .records {
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
     padding: 0 2px 0;
+
 
     .one80s {
       background-color: #9a9a9a;

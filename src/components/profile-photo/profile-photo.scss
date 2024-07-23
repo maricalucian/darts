@@ -1,0 +1,33 @@
+.profile-photo {
+  position: relative;
+  
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  svg#profileProgress {
+    top: -1vw;
+    left: -1vw;
+    transform: rotate(-90deg);
+    position: absolute;
+    circle {
+      transition: stroke-dashoffset 1s linear;
+      stroke: #ffffff33;
+      stroke-width: 6px;
+    }
+    #bar {
+      stroke: #ff9f1e;
+    }
+  }
+  .progress {
+    text-align: center;
+    margin-top: 12px;
+    position: relative;
+    display: inline-block;
+
+
+  
+  }
+}

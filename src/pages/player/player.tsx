@@ -18,13 +18,17 @@ import {
 } from "../../firestore/competition";
 import { getOrdinalSuffix } from "../../core/utils";
 import { MedalSvg } from "../../svg/MedalSvg";
-import CapturePhoto from "../../components/CapturePhoto";
+import CapturePhoto from "../../components/profile-photo/profile-photo";
+import ProfilePhoto from "../../components/profile-photo/profile-photo";
+import { ADM } from "../../core/constants";
 
 type TPlayerPage = {
   competition: Competition;
   playersMap: TPlayersList;
   round: FirestoreRound;
   compId: string;
+  usersMap: { [key: string]: string };
+  authUid: string;
 };
 
 export const PlayerPage = ({
@@ -32,6 +36,8 @@ export const PlayerPage = ({
   playersMap,
   round,
   compId,
+  usersMap,
+  authUid,
 }: TPlayerPage): ReactElement => {
   const [stats, setStats] = useState({} as TStanding);
   const [is180record, setIs180record] = useState(false as any);
@@ -78,7 +84,10 @@ export const PlayerPage = ({
           </div>
           <div className="top-flex">
             <div className="photo-container">
-              <img src="/player.jpeg" width="90%" />
+              <ProfilePhoto
+                uid={params.uid}
+                canEdit={usersMap[authUid] === params.uid || authUid === ADM}
+              />
             </div>
             <div style={{ flex: 1 }}>
               <div className="stats">
@@ -141,7 +150,6 @@ export const PlayerPage = ({
             </div>
           </div>
         </div>
-        {/* <CapturePhoto /> */}
       </div>
     </>
   );
