@@ -1,15 +1,17 @@
 .profile-photo {
-  position: relative;
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   
   img {
-    position: absolute;
+    // position: absolute;
     top: 0;
     left: 0;
   }
 
   svg#profileProgress {
-    top: -1vw;
-    left: -1vw;
     transform: rotate(-90deg);
     position: absolute;
     circle {

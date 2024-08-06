@@ -74,13 +74,11 @@ const ProfilePhoto = ({ uid, canEdit }: any): ReactElement => {
         setImage("/player.jpeg");
       });
   }, [uid]);
-
   return (
     <div className="profile-photo">
       <input
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={handleFileChange}
         style={{ display: "none" }}
         id="fileInput"

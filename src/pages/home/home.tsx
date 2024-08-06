@@ -109,11 +109,18 @@ export const HomePage = ({
   }, [currendRoundIndex, displayRound.round, round.round, roundPlayers]);
 
   useEffect(() => {
-    if (compId === "funday24" && user.user?.uid && usersMap[user.user?.uid]) {
+    if (
+      compId === "funday24" &&
+      user.user?.uid &&
+      usersMap[user.user?.uid] &&
+      round.status === "registering"
+    ) {
       setUserCanRegister(true);
-      setUserIsRegistered(Object.keys(roundPlayers).includes(usersMap[user.user?.uid]))
+      setUserIsRegistered(
+        Object.keys(roundPlayers).includes(usersMap[user.user?.uid])
+      );
     }
-  }, [user.user?.uid, usersMap, roundPlayers]);
+  }, [user.user?.uid, usersMap, roundPlayers, round.status]);
 
   const selectRound = (round: any) => {
     if (round === currendRoundIndex) {
@@ -275,11 +282,15 @@ export const HomePage = ({
               onClick={() => {
                 if (
                   // eslint-disable-next-line no-restricted-globals
-                  confirm(`Are you sure you want to ${userIsRegistered && 'un'}register for this round?`)
+                  confirm(
+                    `Are you sure you want to ${
+                      userIsRegistered && "un"
+                    }register for this round?`
+                  )
                 ) {
                   if (user.user?.uid) {
                     console.log(usersMap[user.user?.uid]);
-                    if(userIsRegistered) {
+                    if (userIsRegistered) {
                       removeRoundPlayer(round.round, usersMap[user.user?.uid]);
                       setUserIsRegistered(false);
                     } else {
