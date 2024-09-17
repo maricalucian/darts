@@ -35,25 +35,31 @@ const goToPosition = () => {
 
 const scales = [
   {
-    matchWidth: 140,
+    matchWidth: 160,
     matchHorizontalSpacing: 10,
     matchHeight: 40,
     matchVerticalSpacing: 10,
+    gameNoWidth: 16,
     scoreBoxWidth: 16,
+    averageWidh: 32,
   },
   {
-    matchWidth: 180,
+    matchWidth: 220,
     matchHorizontalSpacing: 20,
     matchHeight: 50,
     matchVerticalSpacing: 20,
+    gameNoWidth: 20,
     scoreBoxWidth: 20,
+    averageWidh: 40,
   },
   {
-    matchWidth: 200,
+    matchWidth: 240,
     matchHorizontalSpacing: 30,
     matchHeight: 60,
     matchVerticalSpacing: 40,
+    gameNoWidth: 30,
     scoreBoxWidth: 30,
+    averageWidh: 60,
   },
 ];
 
@@ -115,7 +121,7 @@ const drawMatchLine = (
 };
 
 const getShortenedName = (name: string): string => {
-  const parts = name.split(' ');
+  const parts = name.split(" ");
   return `${parts[1]} ${parts[0][0]}`;
 };
 
@@ -147,7 +153,7 @@ const drawMatch = (
   teams: TTeams,
   isPairs: boolean
 ) => {
-  const { matchWidth, matchHeight, scoreBoxWidth } = dimensions;
+  const { matchWidth, matchHeight, scoreBoxWidth, gameNoWidth, averageWidh } = dimensions;
   const hasBlanks = match.player1 === BLANK || match.player2 === BLANK;
   const { x, y } = matchPositions[match.number];
   let topScoreBackground =
@@ -215,9 +221,9 @@ const drawMatch = (
         }}
       >
         <rect
-          x={x - matchWidth / 2 + scoreBoxWidth}
+          x={x - matchWidth / 2 + gameNoWidth}
           y={y - matchHeight / 2}
-          width={matchWidth - 2 * scoreBoxWidth}
+          width={matchWidth - scoreBoxWidth - gameNoWidth}
           height={matchHeight / 2}
           style={{
             fill:
@@ -228,7 +234,7 @@ const drawMatch = (
         {/* top player text */}
         {match.player1 && (
           <text
-            x={x}
+            x={x - (scoreBoxWidth - gameNoWidth) / 2 - averageWidh / 2}
             y={y - matchHeight / 4 + 2}
             className={`${match.player1 === BLANK && "info"} ${
               match.winner === match.player1 &&
@@ -255,9 +261,9 @@ const drawMatch = (
         }}
       >
         <rect
-          x={x - matchWidth / 2 + scoreBoxWidth}
+          x={x - matchWidth / 2 + gameNoWidth}
           y={y}
-          width={matchWidth - 2 * scoreBoxWidth}
+          width={matchWidth - scoreBoxWidth - gameNoWidth}
           height={matchHeight / 2}
           style={{
             fill:
@@ -268,7 +274,7 @@ const drawMatch = (
         {/* bottom player text */}
         {match.player2 && (
           <text
-            x={x}
+            x={x - (scoreBoxWidth - gameNoWidth) / 2 - averageWidh / 2}
             y={y + matchHeight / 4}
             className={`${match.player2 === BLANK && "info"} ${
               match.winner === match.player2 &&
@@ -288,9 +294,19 @@ const drawMatch = (
 
       {/* vertical match number line */}
       <line
-        x1={x - matchWidth / 2 + scoreBoxWidth}
+        x1={x - matchWidth / 2 + gameNoWidth}
         y1={y - matchHeight / 2}
-        x2={x - matchWidth / 2 + scoreBoxWidth}
+        x2={x - matchWidth / 2 + gameNoWidth}
+        y2={y + matchHeight / 2}
+        stroke={lineColor}
+        strokeWidth={0.5}
+      />
+
+      {/* vertical average number line */}
+      <line
+        x1={x + matchWidth / 2 - scoreBoxWidth - averageWidh}
+        y1={y - matchHeight / 2}
+        x2={x + matchWidth / 2 - scoreBoxWidth - averageWidh}
         y2={y + matchHeight / 2}
         stroke={lineColor}
         strokeWidth={0.5}
@@ -298,7 +314,7 @@ const drawMatch = (
 
       {/* horizontal line */}
       <line
-        x1={x - matchWidth / 2 + scoreBoxWidth}
+        x1={x - matchWidth / 2 + gameNoWidth}
         y1={y}
         x2={x + matchWidth / 2 - scoreBoxWidth}
         y2={y}
@@ -318,7 +334,7 @@ const drawMatch = (
       />
 
       {/* match number */}
-      <text x={x - matchWidth / 2 + scoreBoxWidth / 2} y={y}>
+      <text x={x - matchWidth / 2 + gameNoWidth / 2} y={y}>
         {match.number}
       </text>
 
@@ -332,12 +348,29 @@ const drawMatch = (
           >
             {match.score1 || 0}
           </text>
+          {/* top avg */}
+          <text
+            x={x + matchWidth / 2 - scoreBoxWidth - averageWidh / 2}
+            y={y - matchHeight / 4 + 2}
+            className="average"
+          >
+            {match.player1avg || ''}
+          </text>
+
           <text
             x={x + matchWidth / 2 - scoreBoxWidth / 2}
             y={y + matchHeight / 4}
             className="score"
           >
             {match.score2 || 0}
+          </text>
+          {/* bottom avg */}
+          <text
+            x={x + matchWidth / 2 - scoreBoxWidth - averageWidh / 2}
+            y={y + matchHeight / 4}
+            className="average"
+          >
+            {match.player2avg || ''}
           </text>
         </>
       )}
