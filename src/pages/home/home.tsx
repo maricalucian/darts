@@ -110,7 +110,6 @@ export const HomePage = ({
 
   useEffect(() => {
     if (
-      compId === "funday24" &&
       user.user?.uid &&
       usersMap[user.user?.uid] &&
       round.status === "registering"
