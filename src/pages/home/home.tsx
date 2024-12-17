@@ -117,7 +117,7 @@ export const HomePage = ({
       if (displayRound.type !== "teams"){
       setUserCanRegister(true);
       } else {
-        setUserCanRegister(true);
+        setUserCanRegister(false);
       }
       setUserIsRegistered(
         Object.keys(roundPlayers).includes(usersMap[user.user?.uid])
