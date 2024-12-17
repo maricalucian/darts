@@ -114,12 +114,16 @@ export const HomePage = ({
       usersMap[user.user?.uid] &&
       round.status === "registering"
     ) {
+      if (displayRound.type !== "teams"){
       setUserCanRegister(true);
+      } else {
+        setUserCanRegister(true);
+      }
       setUserIsRegistered(
         Object.keys(roundPlayers).includes(usersMap[user.user?.uid])
       );
     }
-  }, [user.user?.uid, usersMap, roundPlayers, round.status]);
+  }, [user.user?.uid, usersMap, roundPlayers, round.status,displayRound.type ]);
 
   const selectRound = (round: any) => {
     if (round === currendRoundIndex) {
